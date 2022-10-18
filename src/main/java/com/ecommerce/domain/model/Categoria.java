@@ -1,11 +1,10 @@
-package com.ecommerce.domain.categoria;
+package com.ecommerce.domain.model;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -24,5 +23,4 @@ public class Categoria {
 
   @Column(nullable = false)
   private String descricao;
-
 }
