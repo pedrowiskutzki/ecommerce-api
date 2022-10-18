@@ -1,3 +1,5 @@
+--Arquivo para popular as tabelas
+
 insert into categoria (id, nome, descricao) values (1, 'Informática','Tudo sobre tecnologias');
 insert into categoria (id, nome, descricao) values (2, 'Casa', 'Utilidades da casa em geral');
 insert into categoria (id, nome, descricao) values (3, 'Celular', 'Aparelho celular e acessórios');
