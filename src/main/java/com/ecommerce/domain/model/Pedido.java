@@ -1,6 +1,7 @@
 package com.ecommerce.domain.model;
 
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -8,6 +9,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
 import lombok.Data;
@@ -44,5 +46,8 @@ public class Pedido {
 	@OneToOne
 	@JoinColumn(name = "id_cliente")
 	private Cliente cliente;
+	
+	@OneToMany(mappedBy = "pedido")	
+	private List<ItemPedido> itemPedido;
 
 }
