@@ -1,25 +1,29 @@
 package com.ecommerce.domain.model;
 
 import java.math.BigDecimal;
-import java.sql.Date;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-
+import lombok.Getter;
+import lombok.Setter;
 
 @Data
+@Getter
+@Setter
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
 public class Produto {
 
-    @EqualsAndHashCode.Include
+	@EqualsAndHashCode.Include
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id_produto;
@@ -34,13 +38,17 @@ public class Produto {
     private Long quantidadeEstoque;
 
     @Column(name = "data_cadastro")
-    private Data dataCadastro;
+    private Date dataCadastro;
 
     @Column(name = "valor_unitario", nullable = false)
     private BigDecimal valorUnitario;
 
-    //imagem
+	// imagem
 
-    //id_categoria
- }
+	@ManyToOne
+	@JoinColumn(name = "id_categoria")
+	private Categoria categoria;
 
+	
+
+}

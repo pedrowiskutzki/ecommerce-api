@@ -1,10 +1,13 @@
 package com.ecommerce.domain.model;
 
+import java.util.Date;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToOne;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -16,41 +19,33 @@ import lombok.Setter;
 @Setter
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
-public class Categoria {
+public class Cliente {
 
 	@EqualsAndHashCode.Include
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id_categoria;
+	private Long id_cliente;
 
 	@Column(nullable = false)
-	private String nome;
+	private String email;
+
+	@Column(name = "nome_completo", nullable = false)
+	private String nomeCompleto;
 
 	@Column(nullable = false)
-	private String descricao;
+	private String cpf;
 
-	public Long getId_categoria() {
-		return id_categoria;
-	}
+	@Column(nullable = false)
+	private Integer telefone;
 
-	public void setId_categoria(Long id_categoria) {
-		this.id_categoria = id_categoria;
-	}
+	@Column(name="data_nascimento", nullable = false)
+	private Date dataNascimento;	
 
-	public String getNome() {
-		return nome;
-	}
+	@OneToOne
+	private Pedido pedido;
 
-	public void setNome(String nome) {
-		this.nome = nome;
-	}
+	//Endereço
 
-	public String getDescricao() {
-		return descricao;
-	}
-
-	public void setDescricao(String descricao) {
-		this.descricao = descricao;
-	}
+	
 
 }
