@@ -1,7 +1,6 @@
 package com.ecommerce.domain.model.dtos;
 
 import javax.persistence.Id;
-import javax.validation.constraints.NotBlank;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -12,12 +11,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class CategoriaDto {
 	@Id
-	private Long id;
+	private Long id;	
 	
-	@NotBlank
-	private String nome;
+	private String nome;	
 	
-	@NotBlank
 	private String descricao;
 
 	public Long getId() {
