@@ -1,6 +1,5 @@
 package com.ecommerce.domain.model;
 
-import java.math.BigDecimal;
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -42,7 +41,7 @@ public class Produto {
     private Date dataCadastro;
 
     @Column(name = "valor_unitario", nullable = false)
-    private BigDecimal valorUnitario;
+    private Double valorUnitario;
 
 	// imagem
 
@@ -52,6 +51,70 @@ public class Produto {
 	
 	@OneToOne
 	private ItemPedido itemPedido;
+
+	public Long getId_produto() {
+		return id_produto;
+	}
+
+	public void setId_produto(Long id_produto) {
+		this.id_produto = id_produto;
+	}
+
+	public String getNome() {
+		return nome;
+	}
+
+	public void setNome(String nome) {
+		this.nome = nome;
+	}
+
+	public String getDescricao() {
+		return descricao;
+	}
+
+	public void setDescricao(String descricao) {
+		this.descricao = descricao;
+	}
+
+	public Long getQuantidadeEstoque() {
+		return quantidadeEstoque;
+	}
+
+	public void setQuantidadeEstoque(Long quantidadeEstoque) {
+		this.quantidadeEstoque = quantidadeEstoque;
+	}
+
+	public Date getDataCadastro() {
+		return dataCadastro;
+	}
+
+	public void setDataCadastro(Date dataCadastro) {
+		this.dataCadastro = dataCadastro;
+	}
+
+	public Double getValorUnitario() {
+		return valorUnitario;
+	}
+
+	public void setValorUnitario(Double valorUnitario) {
+		this.valorUnitario = valorUnitario;
+	}
+
+	public Categoria getCategoria() {
+		return categoria;
+	}
+
+	public void setCategoria(Categoria categoria) {
+		this.categoria = categoria;
+	}
+
+	public ItemPedido getItemPedido() {
+		return itemPedido;
+	}
+
+	public void setItemPedido(ItemPedido itemPedido) {
+		this.itemPedido = itemPedido;
+	}
 
 	
 
