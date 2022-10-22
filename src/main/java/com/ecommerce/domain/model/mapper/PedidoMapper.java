@@ -1,26 +1,36 @@
 package com.ecommerce.domain.model.mapper;
 
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.ecommerce.domain.model.Cliente;
-import com.ecommerce.domain.model.dtos.ClienteDto;
+import com.ecommerce.domain.model.Pedido;
+import com.ecommerce.domain.model.dtos.PedidoRequestDTO;
+import com.ecommerce.domain.model.dtos.PedidoResponseDTO;
 
 @Component
 public class PedidoMapper {
 	
 	private ModelMapper mapper = new ModelMapper();
 	
-	public ClienteDto toDto(Cliente cliente) {
-		return mapper.map(cliente, ClienteDto.class);		
+	public  PedidoResponseDTO modelToResponse(Pedido pedido) {
+		return mapper.map(pedido, PedidoResponseDTO.class);		
 	}
-	public Cliente toModel(ClienteDto clienteDto) {
-		return mapper.map(clienteDto, Cliente.class);
+	public Pedido requestToModel( PedidoResponseDTO pedidoDTO) {
+		return mapper.map(pedidoDTO, Pedido.class);
 	}
-//	public List<ClienteDto> toDtoList(List<Cliente> clientes){
-//		return clientes.stream()
-//				.map(this::toDto)
+	
+	public  PedidoRequestDTO modelToRequest(Pedido pedido) {
+		return mapper.map(pedido, PedidoRequestDTO.class);		
+	}
+	public Pedido requestToModel( PedidoRequestDTO pedidoDTO) {
+		return mapper.map(pedidoDTO, Pedido.class);
+	}
+	
+	
+	
+//	public List<PedidoDTO> toDTOList(List<Pedido> pedidos){
+//		return pedidos.stream()
+//				.map(this::toDTO)
 //				.collect(Collectors.toList());
 //	}
 
