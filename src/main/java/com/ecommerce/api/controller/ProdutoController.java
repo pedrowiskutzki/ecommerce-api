@@ -1,7 +1,6 @@
 package com.ecommerce.api.controller;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,9 +14,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ecommerce.domain.model.Produto;
-import com.ecommerce.domain.model.dtos.ProdutoDTO;
-import com.ecommerce.domain.repository.ProdutoRepository;
+import com.ecommerce.domain.model.dtos.ProdutoRequestDTO;
+import com.ecommerce.domain.model.dtos.ProdutoResponseDTO;
 import com.ecommerce.domain.service.ProdutoService;
 
 @RestController
@@ -28,25 +26,25 @@ public class ProdutoController {
 	private ProdutoService produtoService;
 
 	@GetMapping
-	public ResponseEntity<List<ProdutoDTO>> listar() {
+	public ResponseEntity<List<ProdutoResponseDTO>> listar() {
 		return ResponseEntity.ok(produtoService.listarTodos());
 	}
 	
 	@GetMapping("/{produtoId}")
-	public ResponseEntity<ProdutoDTO> listarPorId(@PathVariable Long produtoId)  {
-		ProdutoDTO produtoDTO = produtoService.listarPorId(produtoId);
+	public ResponseEntity<ProdutoResponseDTO> listarPorId(@PathVariable Long produtoId)  {
+		ProdutoResponseDTO produtoDTO = produtoService.listarPorId(produtoId);
 		return ResponseEntity.ok(produtoDTO);
 	}
 
 	@PostMapping
-	public ResponseEntity<ProdutoDTO> adicionar(@RequestBody ProdutoDTO produto) {
-		ProdutoDTO produtoDTO = produtoService.salvar(produto);
+	public ResponseEntity<ProdutoResponseDTO> adicionar(@RequestBody ProdutoRequestDTO produto) {
+		ProdutoResponseDTO produtoDTO = produtoService.salvar(produto);
 		return ResponseEntity.status(HttpStatus.CREATED).body(produtoDTO);
 	}
 
 	@PutMapping("/{produtoId}")
-	public ResponseEntity<ProdutoDTO> atualizar(@PathVariable Long produtoId, @RequestBody ProdutoDTO produto) {
-		ProdutoDTO produtoDTO = produtoService.substituir(produtoId, produto);
+	public ResponseEntity<ProdutoResponseDTO> atualizar(@PathVariable Long produtoId, @RequestBody ProdutoRequestDTO produto) {
+		ProdutoResponseDTO produtoDTO = produtoService.substituir(produtoId, produto);
 		return ResponseEntity.ok(produtoDTO);
 	}
 
