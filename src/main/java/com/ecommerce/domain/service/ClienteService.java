@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 
 import com.ecommerce.domain.exception.ClienteNaoEncontradaException;
 import com.ecommerce.domain.model.Cliente;
-import com.ecommerce.domain.model.dtos.ClienteDto;
+import com.ecommerce.domain.model.dtos.ClienteDTO;
 import com.ecommerce.domain.model.mapper.ClienteMapper;
 import com.ecommerce.domain.repository.ClienteRepository;
 
@@ -26,10 +26,10 @@ public class ClienteService {
 	private ClienteMapper clienteMapper;
 
 	@Transactional
-	public ClienteDto salvar(ClienteDto clienteDto) {
-		Cliente cliente = clienteMapper.toModel(clienteDto);
+	public ClienteDTO salvar(ClienteDTO clienteDTO) {
+		Cliente cliente = clienteMapper.toModel(clienteDTO);
 		Cliente clienteSalvaNoBanco = clienteRepository.save(cliente);
-		return clienteMapper.toDto(clienteSalvaNoBanco);
+		return clienteMapper.toDTO(clienteSalvaNoBanco);
 	}
 
 	@Transactional
@@ -39,19 +39,19 @@ public class ClienteService {
 				.orElseThrow(() -> new ClienteNaoEncontradaException(clienteId));
 	}
 	
-	public ClienteDto listarPorId(Long id)  {
-		return clienteMapper.toDto(buscarOuFalhar(id));
+	public ClienteDTO listarPorId(Long id)  {
+		return clienteMapper.toDTO(buscarOuFalhar(id));
 	}
-	public List<ClienteDto> listarTodos() {
+	public List<ClienteDTO> listarTodos() {
 		return clienteRepository.findAll()
 			.stream()
-			.map(clienteMapper::toDto)
+			.map(clienteMapper::toDTO)
 			.collect(Collectors.toList());
 	}
-	public ClienteDto substituir(Long id, ClienteDto clienteDto) {
+	public ClienteDTO substituir(Long id, ClienteDTO clienteDTO) {
 		Cliente clienteNoBanco = buscarOuFalhar(id);
-		BeanUtils.copyProperties(clienteDto, clienteNoBanco, "id");		
-		return clienteMapper.toDto(clienteRepository.save(clienteNoBanco));
+		BeanUtils.copyProperties(clienteDTO, clienteNoBanco, "id");		
+		return clienteMapper.toDTO(clienteRepository.save(clienteNoBanco));
 	}
 
 	@Transactional
