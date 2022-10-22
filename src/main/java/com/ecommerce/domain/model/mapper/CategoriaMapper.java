@@ -5,17 +5,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.ecommerce.domain.model.Categoria;
-import com.ecommerce.domain.model.dtos.CategoriaDto;
+import com.ecommerce.domain.model.dtos.CategoriaDTO;
 
 @Component
 public class CategoriaMapper {
 	
 	private ModelMapper mapper = new ModelMapper();
 	
-	public CategoriaDto toDto(Categoria categoria) {
-		return mapper.map(categoria, CategoriaDto.class);		
+	public CategoriaDTO toDto(Categoria categoria) {
+		return mapper.map(categoria, CategoriaDTO.class);		
 	}
-	public Categoria toModel(CategoriaDto categoriaDto) {
+	public Categoria toModel(CategoriaDTO categoriaDto) {
 		return mapper.map(categoriaDto, Categoria.class);
 	}
 //	public List<CategoriaDto> toDtoList(List<Categoria> categorias){
