@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 import com.ecommerce.domain.exception.ProdutoNaoEncontradaException;
 import com.ecommerce.domain.model.Produto;
 import com.ecommerce.domain.model.dtos.ProdutoDto;
+import com.ecommerce.domain.model.dtos.ProdutoRequestDTO;
+import com.ecommerce.domain.model.dtos.ProdutoResponseDTO;
 import com.ecommerce.domain.model.mapper.ProdutoMapper;
 import com.ecommerce.domain.repository.ProdutoRepository;
 
@@ -26,10 +28,10 @@ public class ProdutoService {
 	private ProdutoMapper produtoMapper;
 
 	@Transactional
-	public ProdutoDto salvar(ProdutoDto produtoDto) {
-		Produto produto = produtoMapper.toModel(produtoDto);
+	public ProdutoResponseDTO salvar(ProdutoRequestDTO request) {
+		Produto produto = produtoMapper.requestToModel(request);
 		Produto produtoSalvaNoBanco = produtoRepository.save(produto);
-		return produtoMapper.toDto(produtoSalvaNoBanco);
+		return produtoMapper.modelToResponse(produtoSalvaNoBanco);
 	}
 
 	@Transactional
@@ -39,19 +41,22 @@ public class ProdutoService {
 				.orElseThrow(() -> new ProdutoNaoEncontradaException(produtoId));
 	}
 	
-	public ProdutoDto listarPorId(Long id)  {
-		return produtoMapper.toDto(buscarOuFalhar(id));
+	public ProdutoResponseDTO listarPorId(Long id)  {
+		return produtoMapper.modelToResponse(buscarOuFalhar(id));
 	}
-	public List<ProdutoDto> listarTodos() {
+	public List<ProdutoResponseDTO> listarTodos() {
 		return produtoRepository.findAll()
 			.stream()
-			.map(produtoMapper::toDto)
+			.map(produtoMapper::modelToResponse)
 			.collect(Collectors.toList());
 	}
-	public ProdutoDto substituir(Long id, ProdutoDto produtoDto) {
+	
+	
+	public ProdutoResponseDTO substituir(Long id, ProdutoRequestDTO produtoDto) {		
 		Produto produtoNoBanco = buscarOuFalhar(id);
-		BeanUtils.copyProperties(produtoDto, produtoNoBanco, "id");		
-		return produtoMapper.toDto(produtoRepository.save(produtoNoBanco));
+		Produto produto = produtoMapper.requestToModel(produtoDto);
+		BeanUtils.copyProperties(produto, produtoNoBanco, "id");		
+		return produtoMapper.modelToResponse(produtoRepository.save(produtoNoBanco));
 	}
 
 	@Transactional

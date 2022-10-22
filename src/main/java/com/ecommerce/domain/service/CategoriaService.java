@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 
 import com.ecommerce.domain.exception.CategoriaNaoEncontradaException;
 import com.ecommerce.domain.model.Categoria;
-import com.ecommerce.domain.model.dtos.CategoriaDto;
+import com.ecommerce.domain.model.dtos.CategoriaDTO;
 import com.ecommerce.domain.model.mapper.CategoriaMapper;
 import com.ecommerce.domain.repository.CategoriaRepository;
 
@@ -26,7 +26,7 @@ public class CategoriaService {
 	private CategoriaMapper categoriaMapper;
 
 	@Transactional
-	public CategoriaDto salvar(CategoriaDto categoriaDto) {
+	public CategoriaDTO salvar(CategoriaDTO categoriaDto) {
 		Categoria categoria = categoriaMapper.toModel(categoriaDto);
 		Categoria categoriaSalvaNoBanco = categoriaRepository.save(categoria);
 		return categoriaMapper.toDto(categoriaSalvaNoBanco);
@@ -39,16 +39,16 @@ public class CategoriaService {
 				.orElseThrow(() -> new CategoriaNaoEncontradaException(categoriaId));
 	}
 	
-	public CategoriaDto listarPorId(Long id)  {
+	public CategoriaDTO listarPorId(Long id)  {
 		return categoriaMapper.toDto(buscarOuFalhar(id));
 	}
-	public List<CategoriaDto> listarTodos() {
+	public List<CategoriaDTO> listarTodos() {
 		return categoriaRepository.findAll()
 			.stream()
 			.map(categoriaMapper::toDto)
 			.collect(Collectors.toList());
 	}
-	public CategoriaDto substituir(Long id, CategoriaDto categoriaDto) {
+	public CategoriaDTO substituir(Long id, CategoriaDTO categoriaDto) {
 		Categoria categoriaNoBanco = buscarOuFalhar(id);
 		BeanUtils.copyProperties(categoriaDto, categoriaNoBanco, "id");		
 		return categoriaMapper.toDto(categoriaRepository.save(categoriaNoBanco));
