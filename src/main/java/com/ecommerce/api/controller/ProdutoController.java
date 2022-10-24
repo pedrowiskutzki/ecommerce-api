@@ -1,11 +1,13 @@
 package com.ecommerce.api.controller;
 
+
 import com.ecommerce.domain.model.Produto;
 import com.ecommerce.domain.repository.ProdutoRepository;
 import com.ecommerce.domain.service.ProdutoService;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
 
 @RestController
 @RequestMapping("/produtos")
@@ -79,4 +82,5 @@ public class ProdutoController {
   public void remover(@PathVariable Long produtoId) {
     produtoService.excluir(produtoId);
   }
+
 }

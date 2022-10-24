@@ -18,3 +18,4 @@ public interface ProdutoRepository
   @Query("from FotoProduto f where f.produto.id = :produtoId")
   Optional<FotoProduto> findFotoById(Long produtoId);
 }
+

@@ -22,7 +22,7 @@ import com.ecommerce.domain.service.CategoriaService;
 
 @RestController
 @RequestMapping("/categorias")
-public class CategoriaController {	
+public class PedidoController {	
 
 	@Autowired
 	private CategoriaService categoriaService;
