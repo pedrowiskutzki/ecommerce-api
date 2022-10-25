@@ -5,11 +5,7 @@ import com.ecommerce.domain.model.Produto;
 import com.ecommerce.domain.repository.ProdutoRepository;
 import com.ecommerce.domain.service.ProdutoService;
 import java.util.List;
-<<<<<<< HEAD
 import java.util.Optional;
-=======
-
->>>>>>> 5d75d6a (feat(fix):Controllers)
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -21,12 +17,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-<<<<<<< HEAD
-=======
-import com.ecommerce.domain.model.dtos.ProdutoRequestDTO;
-import com.ecommerce.domain.model.dtos.ProdutoResponseDTO;
-import com.ecommerce.domain.service.ProdutoService;
->>>>>>> 5d75d6a (feat(fix):Controllers)
 
 @RestController
 @RequestMapping("/produtos")
@@ -35,7 +25,6 @@ public class ProdutoController {
   @Autowired
   private ProdutoRepository produtoRepository;
 
-<<<<<<< HEAD
   @Autowired
   private ProdutoService produtoService;
 
@@ -93,29 +82,5 @@ public class ProdutoController {
   public void remover(@PathVariable Long produtoId) {
     produtoService.excluir(produtoId);
   }
-=======
-	@GetMapping
-	public ResponseEntity<List<ProdutoResponseDTO>> listar() {
-		return ResponseEntity.ok(produtoService.listarTodos());
-	}
-	
-	@GetMapping("/{produtoId}")
-	public ResponseEntity<ProdutoResponseDTO> listarPorId(@PathVariable Long produtoId)  {
-		ProdutoResponseDTO produtoDTO = produtoService.listarPorId(produtoId);
-		return ResponseEntity.ok(produtoDTO);
-	}
-
-	@PostMapping
-	public ResponseEntity<ProdutoResponseDTO> adicionar(@RequestBody ProdutoRequestDTO produto) {
-		ProdutoResponseDTO produtoDTO = produtoService.salvar(produto);
-		return ResponseEntity.status(HttpStatus.CREATED).body(produtoDTO);
-	}
-
-	@PutMapping("/{produtoId}")
-	public ResponseEntity<ProdutoResponseDTO> atualizar(@PathVariable Long produtoId, @RequestBody ProdutoRequestDTO produto) {
-		ProdutoResponseDTO produtoDTO = produtoService.substituir(produtoId, produto);
-		return ResponseEntity.ok(produtoDTO);
-	}
->>>>>>> 5d75d6a (feat(fix):Controllers)
 
 }

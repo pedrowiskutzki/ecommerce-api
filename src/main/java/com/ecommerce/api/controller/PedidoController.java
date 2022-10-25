@@ -1,7 +1,6 @@
 package com.ecommerce.api.controller;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,43 +14,42 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ecommerce.domain.model.Categoria;
-import com.ecommerce.domain.model.dtos.CategoriaDTO;
-import com.ecommerce.domain.repository.CategoriaRepository;
-import com.ecommerce.domain.service.CategoriaService;
+import com.ecommerce.domain.model.dtos.PedidoRequestDTO;
+import com.ecommerce.domain.model.dtos.PedidoResponseDTO;
+import com.ecommerce.domain.service.PedidoService;
 
 @RestController
-@RequestMapping("/categorias")
+@RequestMapping("/pedidos")
 public class PedidoController {	
 
 	@Autowired
-	private CategoriaService categoriaService;
+	private PedidoService pedidoService;
 
 	@GetMapping
-	public ResponseEntity<List<CategoriaDTO>> listar() {
-		return ResponseEntity.ok(categoriaService.listarTodos());
+	public ResponseEntity<List<PedidoResponseDTO>> listar() {
+		return ResponseEntity.ok(pedidoService.listarTodos());
 	}
 	
-	@GetMapping("/{categoriaId}")
-	public ResponseEntity<CategoriaDTO> listarPorId(@PathVariable Long categoriaId)  {
-		CategoriaDTO categoriaDTO = categoriaService.listarPorId(categoriaId);
-		return ResponseEntity.ok(categoriaDTO);
+	@GetMapping("/{pedidoId}")
+	public ResponseEntity<PedidoResponseDTO> listarPorId(@PathVariable Long pedidoId)  {
+		PedidoResponseDTO pedidoDTO = pedidoService.listarPorId(pedidoId);
+		return ResponseEntity.ok(pedidoDTO);
 	}
 
 	@PostMapping
-	public ResponseEntity<CategoriaDTO> adicionar(@RequestBody CategoriaDTO categoria) {
-		CategoriaDTO categoriaDTO = categoriaService.salvar(categoria);
-		return ResponseEntity.status(HttpStatus.CREATED).body(categoriaDTO);
+	public ResponseEntity<PedidoResponseDTO> adicionar(@RequestBody PedidoRequestDTO produto) {
+		PedidoResponseDTO pedidoDTO = pedidoService.salvar(produto);
+		return ResponseEntity.status(HttpStatus.CREATED).body(pedidoDTO);
 	}
 
-	@PutMapping("/{categoriaId}")
-	public ResponseEntity<CategoriaDTO> atualizar(@PathVariable Long categoriaId, @RequestBody CategoriaDTO categoria) {
-		CategoriaDTO categoriaDTO = categoriaService.substituir(categoriaId, categoria);
-		return ResponseEntity.ok(categoriaDTO);
+	@PutMapping("/{pedidoId}")
+	public ResponseEntity<PedidoResponseDTO> atualizar(@PathVariable Long pedidoId, @RequestBody PedidoRequestDTO produto) {
+		PedidoResponseDTO pedidoDTO = pedidoService.substituir(pedidoId, produto);
+		return ResponseEntity.ok(pedidoDTO);
 	}
 
-	@DeleteMapping("/{categoriaId}")
-	public void remover(@PathVariable Long categoriaId) {
-		categoriaService.excluir(categoriaId);
+	@DeleteMapping("/{pedidoId}")
+	public void remover(@PathVariable Long pedidoId) {
+		pedidoService.excluir(pedidoId);
 	}
 }

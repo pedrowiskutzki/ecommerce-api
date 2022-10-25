@@ -9,7 +9,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.ecommerce.domain.exception.ClienteNaoEncontradaException;
+import com.ecommerce.domain.exception.CategoriaNaoEncontradaException;
 import com.ecommerce.domain.model.Cliente;
 import com.ecommerce.domain.model.dtos.ClienteDTO;
 import com.ecommerce.domain.model.mapper.ClienteMapper;
@@ -36,7 +36,7 @@ public class ClienteService {
 	public Cliente buscarOuFalhar(Long clienteId) {
 		
 		return clienteRepository.findById(clienteId)
-				.orElseThrow(() -> new ClienteNaoEncontradaException(clienteId));
+				.orElseThrow(() -> new CategoriaNaoEncontradaException(clienteId));
 	}
 	
 	public ClienteDTO listarPorId(Long id)  {
