@@ -1,21 +1,12 @@
-/* package com.api.delivery.api.controller;
+package com.ecommerce.api.controller;
 
-import com.api.delivery.api.assembler.UsuarioInputDisassembler;
-import com.api.delivery.api.assembler.UsuarioModelAssembler;
-import com.api.delivery.api.model.UsuarioModel;
-import com.api.delivery.api.model.input.SenhaInput;
-import com.api.delivery.api.model.input.UsuarioComSenhaInput;
-import com.api.delivery.api.model.input.UsuarioInput;
-import com.api.delivery.api.openapi.controller.UsuarioControllerOpenApi;
-import com.api.delivery.domain.model.Usuario;
-import com.api.delivery.domain.repository.UsuarioRepository;
-import com.api.delivery.domain.service.CadastroUsuarioService;
 import java.util.List;
-import javax.validation.Valid;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,75 +16,80 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ecommerce.domain.model.Cliente;
+import com.ecommerce.domain.model.dtos.ClienteDTO;
+import com.ecommerce.domain.repository.ClienteRepository;
+import com.ecommerce.domain.service.ClienteService;
+
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+
 @RestController
-@RequestMapping(path = "/usuarios", produces = MediaType.APPLICATION_JSON_VALUE)
-public class ClienteController implements UsuarioControllerOpenApi {
+@RequestMapping("/clientes")
+public class ClienteController {	
 
-  @Autowired
-  private UsuarioRepository usuarioRepository;
+	@Autowired
+	private ClienteService clienteService;
+	
+	@GetMapping
+	@ApiOperation(value="Lista todos os cliente", notes="Listagem de Clientes")
+	@ApiResponses(value= {	 
+	@ApiResponse(code=200, message="Retorna todos os clientes"),
+	@ApiResponse(code=404, message="Recurso não encontrado"),
+	@ApiResponse(code=505, message="Exceção interna da aplicação"),
+	})
+	public ResponseEntity<List<ClienteDTO>> listar() {
+		return ResponseEntity.ok(clienteService.listarTodos());
+	}
+	
+	@GetMapping("/{clienteId}")
+	@ApiOperation(value="Listando um cliente por id", notes="Listagem de Clientes por id")
+	@ApiResponses(value= {	 
+	@ApiResponse(code=200, message="Retorna cliente pelo id"),
+	@ApiResponse(code=404, message="Recurso não encontrado"),
+	@ApiResponse(code=505, message="Exceção interna da aplicação"),
+	})
+	public ResponseEntity<ClienteDTO> listarPorId(@PathVariable Long clienteId)  {
+		ClienteDTO clienteDTO = clienteService.listarPorId(clienteId);
+		return ResponseEntity.ok(clienteDTO);
+	}
+	
+	@PostMapping
+	@ApiOperation(value="Cadastra cliente ", notes="Cadatro de Clientes")
+	@ApiResponses(value= {	 
+	@ApiResponse(code=201, message="Cliente cadastrado"),
+	@ApiResponse(code=500, message="Ocorreu um Erro na execução"),
+	@ApiResponse(code=505, message="Exceção interna da aplicação"),
+	})
+	public ResponseEntity<ClienteDTO> adicionar(@RequestBody ClienteDTO cliente) {
+		ClienteDTO clienteDTO = clienteService.salvar(cliente);
+		return ResponseEntity.status(HttpStatus.CREATED).body(clienteDTO);
+	}
 
-  @Autowired
-  private CadastroUsuarioService cadastroUsuario;
+	@PutMapping("/{clienteId}")
+	@ApiOperation(value="Substitui um cliente por id", notes="Substitui Clientes por id")
+	@ApiResponses(value= {	 
+	@ApiResponse(code=200, message="Retorna cliente pelo id"),
+	@ApiResponse(code=404, message="Recurso não encontrado"),
+	@ApiResponse(code=500, message="Ocorreu um Erro na execução"),
+	@ApiResponse(code=505, message="Exceção interna da aplicação"),
+	})
+	public ResponseEntity<ClienteDTO> atualizar(@PathVariable Long clienteId, @RequestBody ClienteDTO cliente) {
+		ClienteDTO clienteDTO = clienteService.substituir(clienteId, cliente);
+		return ResponseEntity.ok(clienteDTO);
+	}
 
-  @Autowired
-  private UsuarioModelAssembler usuarioModelAssembler;
-
-  @Autowired
-  private UsuarioInputDisassembler usuarioInputDisassembler;
-
-  @Override
-  @GetMapping
-  public CollectionModel<UsuarioModel> listar() {
-    List<Usuario> todasUsuarios = usuarioRepository.findAll();
-
-    return usuarioModelAssembler.toCollectionModel(todasUsuarios);
-  }
-
-  @Override
-  @GetMapping("/{usuarioId}")
-  public UsuarioModel buscar(@PathVariable Long usuarioId) {
-    Usuario usuario = cadastroUsuario.buscarOuFalhar(usuarioId);
-
-    return usuarioModelAssembler.toModel(usuario);
-  }
-
-  @Override
-  @PostMapping
-  @ResponseStatus(HttpStatus.CREATED)
-  public UsuarioModel adicionar(
-    @RequestBody @Valid UsuarioComSenhaInput usuarioInput
-  ) {
-    Usuario usuario = usuarioInputDisassembler.toDomainObject(usuarioInput);
-    usuario = cadastroUsuario.salvar(usuario);
-
-    return usuarioModelAssembler.toModel(usuario);
-  }
-
-  @Override
-  @PutMapping("/{usuarioId}")
-  public UsuarioModel atualizar(
-    @PathVariable Long usuarioId,
-    @RequestBody @Valid UsuarioInput usuarioInput
-  ) {
-    Usuario usuarioAtual = cadastroUsuario.buscarOuFalhar(usuarioId);
-    usuarioInputDisassembler.copyToDomainObject(usuarioInput, usuarioAtual);
-    usuarioAtual = cadastroUsuario.salvar(usuarioAtual);
-
-    return usuarioModelAssembler.toModel(usuarioAtual);
-  }
-
-  @Override
-  @PutMapping("/{usuarioId}/senha")
-  @ResponseStatus(HttpStatus.NO_CONTENT)
-  public void alterarSenha(
-    @PathVariable Long usuarioId,
-    @RequestBody @Valid SenhaInput senha
-  ) {
-    cadastroUsuario.alterarSenha(
-      usuarioId,
-      senha.getSenhaAtual(),
-      senha.getNovaSenha()
-    );
-  }
+	@DeleteMapping("/{clienteId}")
+	@ApiOperation(value="Deleta um cliente por id", notes="Deleta Clientes por id")
+	@ApiResponses(value= {	 
+	@ApiResponse(code=200, message="Retorna cliente pelo id"),
+	@ApiResponse(code=404, message="Recurso não encontrado"),
+	@ApiResponse(code=500, message="Ocorreu um Erro na execução"),
+	@ApiResponse(code=505, message="Exceção interna da aplicação"),
+	})
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	public void remover(@PathVariable Long clienteId) {
+		clienteService.excluir(clienteId);
+	}
 }
- */

@@ -15,78 +15,77 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ecommerce.domain.model.dtos.PedidoRequestDTO;
-import com.ecommerce.domain.model.dtos.PedidoResponseDTO;
-import com.ecommerce.domain.service.PedidoService;
+import com.ecommerce.domain.model.dtos.ItemPedidoDTO;
+import com.ecommerce.domain.service.ItemPedidoService;
 
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
 @RestController
-@RequestMapping("/pedidos")
-public class PedidoController {	
+@RequestMapping("/itemPedidos")
+public class ItemPedidoController {	
 
 	@Autowired
-	private PedidoService pedidoService;
+	private ItemPedidoService itemPedidoService;
 
 	@GetMapping
-	@ApiOperation(value="Lista todos os pedidos", notes="Listagem de Pedidos")
+	@ApiOperation(value="Lista todos os itens", notes="Listagem de itens")
 	@ApiResponses(value= {	 
-	@ApiResponse(code=200, message="Retorna todos os pedidos"),	
+	@ApiResponse(code=200, message="Retorna todos os itens"),	
 	@ApiResponse(code=505, message="Exceção interna da aplicação"),
 	})
-	public ResponseEntity<List<PedidoResponseDTO>> listar() {
-		return ResponseEntity.ok(pedidoService.listarTodos());
+	public ResponseEntity<List<ItemPedidoDTO>> listar() {
+		return ResponseEntity.ok(itemPedidoService.listarTodos());
 	}
 	
-	@GetMapping("/{pedidoId}")
-	@ApiOperation(value="Listando um pedido por id", notes="Listagem de um pedido por id")
+	@GetMapping("/{itemPedidoId}")
+	@ApiOperation(value="Listando um item por id", notes="Listagem de um item por id")
 	@ApiResponses(value= {	 
 	@ApiResponse(code=200, message="Retorna um pedido pelo id"),
 	@ApiResponse(code=404, message="Recurso não encontrado"),
 	@ApiResponse(code=505, message="Exceção interna da aplicação"),
 	})
-	public ResponseEntity<PedidoResponseDTO> listarPorId(@PathVariable Long pedidoId)  {
-		PedidoResponseDTO pedidoDTO = pedidoService.listarPorId(pedidoId);
-		return ResponseEntity.ok(pedidoDTO);
+	public ResponseEntity<ItemPedidoDTO> listarPorId(@PathVariable Long itemPedidoId)  {
+		ItemPedidoDTO itemPedidoDTO = itemPedidoService.listarPorId(itemPedidoId);
+		return ResponseEntity.ok(itemPedidoDTO);
 	}
 
 	@PostMapping
-	@ApiOperation(value="Cadastra um pedido ", notes="Cadatro de Pedidos")
+	@ApiOperation(value="Cadastra um item ", notes="Cadatro de Itens")
 	@ApiResponses(value= {	 
-	@ApiResponse(code=201, message="Pedido cadastrado"),
+	@ApiResponse(code=201, message="Item cadastrado"),
 	@ApiResponse(code=500, message="Ocorreu um Erro na execução"),
 	@ApiResponse(code=505, message="Exceção interna da aplicação"),
 	})
-	public ResponseEntity<PedidoResponseDTO> adicionar(@RequestBody PedidoRequestDTO produto) {
-		PedidoResponseDTO pedidoDTO = pedidoService.salvar(produto);
-		return ResponseEntity.status(HttpStatus.CREATED).body(pedidoDTO);
+	public ResponseEntity<ItemPedidoDTO> adicionar(@RequestBody ItemPedidoDTO itemPedido) {
+		ItemPedidoDTO itemPedidoDTO = itemPedidoService.salvar(itemPedido);
+		return ResponseEntity.status(HttpStatus.CREATED).body(itemPedidoDTO);
 	}
 
-	@PutMapping("/{pedidoId}")
-	@ApiOperation(value="Substitui um pedido pelo id", notes="Substitui Pedidos pelo id")
+	@PutMapping("/{itemPedidoId}")
+	@ApiOperation(value="Substitui um item pelo id", notes="Substitui itens pelo id")
 	@ApiResponses(value= {	 
 	@ApiResponse(code=200, message="Modificações realizadas com sucesso"),
 	@ApiResponse(code=404, message="Recurso não encontrado"),
 	@ApiResponse(code=500, message="Ocorreu um Erro na execução"),
 	@ApiResponse(code=505, message="Exceção interna da aplicação"),
 	})
-	public ResponseEntity<PedidoResponseDTO> atualizar(@PathVariable Long pedidoId, @RequestBody PedidoRequestDTO produto) {
-		PedidoResponseDTO pedidoDTO = pedidoService.substituir(pedidoId, produto);
-		return ResponseEntity.ok(pedidoDTO);
+	public ResponseEntity<ItemPedidoDTO> atualizar(@PathVariable Long itemPedidoId, @RequestBody ItemPedidoDTO itemPedido) {
+		ItemPedidoDTO itemPedidoDTO = itemPedidoService.substituir(itemPedidoId, itemPedido);
+		return ResponseEntity.ok(itemPedidoDTO);
 	}
 
-	@DeleteMapping("/{pedidoId}")
-	@ApiOperation(value="Deleta um pedido pelo id", notes="Deleta Pedidos pelo id")
+	@DeleteMapping("/{itemPedidoId}")
+	@ApiOperation(value="Deleta um item pelo id", notes="Deleta Itens pelo id")
 	@ApiResponses(value= {	 
-	@ApiResponse(code=204, message="Pedido excluído"),
+	@ApiResponse(code=204, message="Item excluído"),
 	@ApiResponse(code=404, message="Recurso não encontrado"),
 	@ApiResponse(code=500, message="Ocorreu um Erro na execução"),
 	@ApiResponse(code=505, message="Exceção interna da aplicação"),
 	})
 	@ResponseStatus(HttpStatus.NO_CONTENT)
-	public void remover(@PathVariable Long pedidoId) {
-		pedidoService.excluir(pedidoId);
+	public void remover(@PathVariable Long itemPedidoId) {
+		itemPedidoService.excluir(itemPedidoId);
 	}
 }

@@ -1,18 +1,11 @@
 package com.ecommerce.api.controller;
 
-import com.ecommerce.api.assembler.FotoProdutoModelAssembler;
-import com.ecommerce.api.model.FotoProdutoModel;
-import com.ecommerce.api.model.input.FotoProdutoInput;
-import com.ecommerce.domain.exception.EntidadeNaoEncontradaException;
-import com.ecommerce.domain.model.FotoProduto;
-import com.ecommerce.domain.model.Produto;
-import com.ecommerce.domain.service.FotoProdutoService;
-import com.ecommerce.domain.service.FotoStorageService;
-import com.ecommerce.domain.service.ProdutoService;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+
 import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpStatus;
@@ -28,6 +21,20 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+
+import com.ecommerce.api.controller.assembler.FotoProdutoModelAssembler;
+import com.ecommerce.api.controller.model.FotoProdutoModel;
+import com.ecommerce.api.controller.model.input.FotoProdutoInput;
+import com.ecommerce.domain.exception.EntidadeNaoEncontradaException;
+import com.ecommerce.domain.model.FotoProduto;
+import com.ecommerce.domain.model.Produto;
+import com.ecommerce.domain.service.FotoProdutoService;
+import com.ecommerce.domain.service.FotoStorageService;
+import com.ecommerce.domain.service.ProdutoService;
+
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 
 @RestController
 @RequestMapping("/produtos/{produtoId}/foto")
@@ -53,6 +60,12 @@ public class FotoProdutoController {
   }
 
   @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  @ApiOperation(value="Substitui uma foto pelo id", notes="Substitui fotos pelo id")
+	@ApiResponses(value= {	 
+	@ApiResponse(code=200, message="Modificações realizadas com sucesso"),
+	@ApiResponse(code=404, message="Recurso não encontrado"),
+	@ApiResponse(code=500, message="Ocorreu um Erro na execução"),	
+	})
   public FotoProdutoModel atualizarFoto(
     @PathVariable Long produtoId,
     @Valid FotoProdutoInput fotoProdutoInput
@@ -77,6 +90,11 @@ public class FotoProdutoController {
   }
 
   @GetMapping
+  @ApiOperation(value="Lista todos as fotos", notes="Listagem de fotos")
+	@ApiResponses(value= {	 
+	@ApiResponse(code=200, message="Retorna todos as fotos"),	
+	@ApiResponse(code=505, message="Exceção interna da aplicação"),
+	})
   public ResponseEntity<InputStreamResource> servir(
     @PathVariable Long produtoId,
     @RequestHeader(name = "accept") String acceptHeader
@@ -124,6 +142,12 @@ public class FotoProdutoController {
   }
 
   @DeleteMapping
+  @ApiOperation(value="Deleta uma foto pelo id", notes="Deleta Fotos pelo id")
+	@ApiResponses(value= {	 
+	@ApiResponse(code=204, message="Foto excluída"),
+	@ApiResponse(code=404, message="Recurso não encontrado"),
+	@ApiResponse(code=500, message="Ocorreu um Erro na execução"),
+	})
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void excluir(@PathVariable Long produtoId) {
     fotoProdutoService.excluir(produtoId);
