@@ -1,5 +1,6 @@
-package com.ecommerce.api.controller;
+/* package com.ecommerce.api.controller;
 
+import com.api.delivery.api.ResourceUriHelper;
 import com.ecommerce.api.assembler.CidadeInputDisassembler;
 import com.ecommerce.api.assembler.CidadeModelAssembler;
 import com.ecommerce.api.model.CidadeModel;
@@ -13,6 +14,7 @@ import com.ecommerce.domain.service.CidadeService;
 import java.util.List;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -41,13 +43,15 @@ public class CidadeController implements CidadeControllerOpenApi {
   @Autowired
   private CidadeInputDisassembler cidadeInputDisassembler;
 
+  @Override
   @GetMapping
-  public List<CidadeModel> listar() {
+  public CollectionModel<CidadeModel> listar() {
     List<Cidade> todasCidades = cidadeRepository.findAll();
 
     return cidadeModelAssembler.toCollectionModel(todasCidades);
   }
 
+  @Override
   @GetMapping("/{cidadeId}")
   public CidadeModel buscar(@PathVariable Long cidadeId) {
     Cidade cidade = cidadeService.buscarOuFalhar(cidadeId);
@@ -55,6 +59,7 @@ public class CidadeController implements CidadeControllerOpenApi {
     return cidadeModelAssembler.toModel(cidade);
   }
 
+  @Override
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
   public CidadeModel adicionar(@RequestBody @Valid CidadeInput cidadeInput) {
@@ -63,12 +68,17 @@ public class CidadeController implements CidadeControllerOpenApi {
 
       cidade = cidadeService.salvar(cidade);
 
-      return cidadeModelAssembler.toModel(cidade);
+      CidadeModel cidadeModel = cidadeModelAssembler.toModel(cidade);
+
+      ResourceUriHelper.addUriInResponseHeader(cidadeModel.getId());
+
+      return cidadeModel;
     } catch (EstadoNaoEncontradoException e) {
       throw new NegocioException(e.getMessage(), e);
     }
   }
 
+  @Override
   @PutMapping("/{cidadeId}")
   public CidadeModel atualizar(
     @PathVariable Long cidadeId,
@@ -87,9 +97,11 @@ public class CidadeController implements CidadeControllerOpenApi {
     }
   }
 
+  @Override
   @DeleteMapping("/{cidadeId}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void remover(@PathVariable Long cidadeId) {
     cidadeService.excluir(cidadeId);
   }
 }
+ */

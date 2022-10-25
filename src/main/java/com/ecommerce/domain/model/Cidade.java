@@ -1,5 +1,7 @@
 package com.ecommerce.domain.model;
 
+import com.ecommerce.core.validation.Groups;
+import com.fasterxml.jackson.databind.ser.std.StdKeySerializers.Default;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -10,6 +12,7 @@ import javax.persistence.ManyToOne;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.groups.ConvertGroup;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -28,8 +31,8 @@ public class Cidade {
   private String nome;
 
   @Valid
-  /*   @ConvertGroup(from = Default.class, to = Groups.EstadoId.class)
-   */@NotNull
+  @ConvertGroup(from = Default.class, to = Groups.EstadoId.class)
+  @NotNull
   @ManyToOne
   @JoinColumn(nullable = false)
   private Estado estado;

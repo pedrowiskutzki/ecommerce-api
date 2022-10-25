@@ -1,27 +1,47 @@
-package com.ecommerce.api.assembler;
+/* package com.ecommerce.api.assembler;
 
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
+import com.ecommerce.api.controller.ClienteController;
+import com.ecommerce.api.controller.PedidoController;
 import com.ecommerce.api.model.PedidoResumoModel;
 import com.ecommerce.domain.model.Pedido;
-import java.util.List;
-import java.util.stream.Collectors;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.server.mvc.RepresentationModelAssemblerSupport;
 import org.springframework.stereotype.Component;
 
 @Component
-public class PedidoResumoModelAssembler {
+public class PedidoResumoModelAssembler
+  extends RepresentationModelAssemblerSupport<Pedido, PedidoResumoModel> {
 
   @Autowired
   private ModelMapper modelMapper;
 
-  public PedidoResumoModel toModel(Pedido pedido) {
-    return modelMapper.map(pedido, PedidoResumoModel.class);
+  public PedidoResumoModelAssembler() {
+    super(PedidoController.class, PedidoResumoModel.class);
   }
 
-  public List<PedidoResumoModel> toCollectionModel(List<Pedido> pedidos) {
-    return pedidos
-      .stream()
-      .map(pedido -> toModel(pedido))
-      .collect(Collectors.toList());
-  }
+  @Override
+  public PedidoResumoModel toModel(Pedido pedido) {
+    PedidoResumoModel pedidoModel = createModelWithId(
+      pedido.getCodigo(),
+      pedido
+    );
+    modelMapper.map(pedido, pedidoModel);
+
+    pedidoModel.add(linkTo(PedidoController.class).withRel("pedidos"));
+
+    pedidoModel
+      .getCliente()
+      .add(
+        linkTo(
+          methodOn(ClienteController.class).buscar(pedido.getCliente().getId())
+        )
+          .withSelfRel()
+      );
+
+    return pedidoModel;
 }
+ */

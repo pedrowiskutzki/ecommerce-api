@@ -1,8 +1,8 @@
 package com.ecommerce.api.controller;
 
-import com.ecommerce.api.controller.assembler.FotoProdutoModelAssembler;
-import com.ecommerce.api.controller.model.FotoProdutoModel;
-import com.ecommerce.api.controller.model.input.FotoProdutoInput;
+import com.ecommerce.api.assembler.FotoProdutoModelAssembler;
+import com.ecommerce.api.model.FotoProdutoModel;
+import com.ecommerce.api.model.input.FotoProdutoInput;
 import com.ecommerce.domain.exception.EntidadeNaoEncontradaException;
 import com.ecommerce.domain.model.FotoProduto;
 import com.ecommerce.domain.model.Produto;

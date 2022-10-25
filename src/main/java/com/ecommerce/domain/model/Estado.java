@@ -1,5 +1,6 @@
 package com.ecommerce.domain.model;
 
+import com.ecommerce.core.validation.Groups;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -15,7 +16,7 @@ import lombok.EqualsAndHashCode;
 @Entity
 public class Estado {
 
-  @NotNull
+  @NotNull(groups = Groups.EstadoId.class)
   @EqualsAndHashCode.Include
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)

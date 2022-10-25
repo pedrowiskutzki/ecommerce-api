@@ -10,12 +10,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ProdutoRepository
   extends JpaRepository<Produto, Long>, ProdutoRepositoryQueries {
-  /**
-   * Metodo para buscar id de produto
-   * @param produtoId
-   * @return Id de produto
-   */
-  @Query("from FotoProduto f where f.produto.id = :produtoId")
+  @Query("select f from FotoProduto f join f.produto p ")
   Optional<FotoProduto> findFotoById(Long produtoId);
 }
-

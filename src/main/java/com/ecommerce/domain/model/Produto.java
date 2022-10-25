@@ -1,57 +1,37 @@
 package com.ecommerce.domain.model;
 
-
 import java.math.BigDecimal;
-import java.util.Date;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-
-import lombok.Getter;
-import lombok.Setter;
 
 @Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
 public class Produto {
 
-
   @EqualsAndHashCode.Include
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @Column(name = "nome", nullable = false)
+  @Column(nullable = false)
   private String nome;
 
-  @Column(name = "descricao", nullable = false)
+  @Column(nullable = false)
   private String descricao;
 
-  @Column(name = "qtd_estoque", nullable = false)
-  private Long quantidadeEstoque;
+  @Column(nullable = false)
+  private BigDecimal preco;
 
-  @Column(name = "data_cadastro")
-  private Date dataCadastro;
+  @Column(nullable = false)
+  private Boolean ativo;
 
-  @Column(name = "valor_unitario", nullable = false)
-  private BigDecimal valorUnitario;
-  //imagem
-  //id_categoria
-  
-	@ManyToOne
-	@JoinColumn(name = "id_categoria")
-	private Categoria categoria;
-	
-	@OneToOne
-	private ItemPedido itemPedido;
-
+  @ManyToOne
+  private Categoria categoria;
 }

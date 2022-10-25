@@ -1,4 +1,4 @@
-package com.ecommerce.infra;
+package com.ecommerce.infra.repository;
 
 import com.ecommerce.domain.model.FotoProduto;
 import com.ecommerce.domain.repository.ProdutoRepositoryQueries;

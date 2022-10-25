@@ -15,8 +15,7 @@ public class PedidoMapper {
 	public  PedidoResponseDTO modelToResponse(Pedido pedido) {
 		return mapper.map(pedido, PedidoResponseDTO.class);		
 	}
-	public Pedido responseToModel(PedidoResponseDTO pedidoDTO) {
-		
+	public Pedido requestToModel( PedidoResponseDTO pedidoDTO) {
 		return mapper.map(pedidoDTO, Pedido.class);
 	}
 	
@@ -24,15 +23,7 @@ public class PedidoMapper {
 		return mapper.map(pedido, PedidoRequestDTO.class);		
 	}
 	public Pedido requestToModel( PedidoRequestDTO pedidoDTO) {
-		Pedido pedido = new Pedido();
-		pedido.setDataEntrega(pedidoDTO.getDataEntrega());
-		pedido.setDataEnvio(pedidoDTO.getDataEnvio());
-		pedido.setStatus(pedidoDTO.getStatus());
-		pedido.setCliente(pedidoDTO.getCliente());
-		return pedido;
-		
-		
-//	 return	mapper.map(pedidoDTO, Pedido.class);
+		return mapper.map(pedidoDTO, Pedido.class);
 	}
 	
 	

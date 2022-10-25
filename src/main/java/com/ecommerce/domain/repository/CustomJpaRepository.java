@@ -6,7 +6,7 @@ import org.springframework.data.repository.NoRepositoryBean;
 
 @NoRepositoryBean
 public interface CustomJpaRepository<T, ID> extends JpaRepository<T, ID> {
-  Optional<T> buscarPrimeiro();
+  /*   Optional<T> buscarPrimeiro(); */
 
-  void detach(T entity);
+  /* void detach(T entity); */
 }

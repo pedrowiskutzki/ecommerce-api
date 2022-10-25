@@ -1,55 +1,132 @@
-package com.ecommerce.api.controller;
+/* package com.ecommerce.api.controller;
 
-import java.util.List;
+import java.util.Map;
+
+import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ecommerce.domain.model.dtos.PedidoRequestDTO;
-import com.ecommerce.domain.model.dtos.PedidoResponseDTO;
-import com.ecommerce.domain.service.PedidoService;
+import com.api.delivery.api.assembler.PedidoModelAssembler;
+import com.api.delivery.domain.model.Usuario;
+import com.ecommerce.api.assembler.PedidoInputDisassembler;
+import com.ecommerce.api.assembler.PedidoResumoModelAssembler;
+import com.ecommerce.api.model.PedidoModel;
+import com.ecommerce.api.model.PedidoResumoModel;
+import com.ecommerce.api.model.input.PedidoInput;
+import com.ecommerce.api.openapi.controller.PedidoControllerOpenApi;
+import com.ecommerce.core.data.PageWrapper;
+import com.ecommerce.core.data.PageableTranslator;
+import com.ecommerce.domain.exception.EntidadeNaoEncontradaException;
+import com.ecommerce.domain.exception.NegocioException;
+import com.ecommerce.domain.filter.PedidoFilter;
+import com.ecommerce.domain.model.Pedido;
+import com.ecommerce.domain.repository.PedidoRepository;
+import com.ecommerce.infra.repository.spec.PedidoSpecs;
 
 @RestController
-@RequestMapping("/pedidos")
-public class PedidoController {	
+@RequestMapping(path = "/pedidos", produces = MediaType.APPLICATION_JSON_VALUE)
+public class PedidoController implements PedidoControllerOpenApi {
 
-	@Autowired
-	private PedidoService pedidoService;
+  @Autowired
+  private PedidoRepository pedidoRepository;
 
-	@GetMapping
-	public ResponseEntity<List<PedidoResponseDTO>> listar() {
-		return ResponseEntity.ok(pedidoService.listarTodos());
-	}
-	
-	@GetMapping("/{pedidoId}")
-	public ResponseEntity<PedidoResponseDTO> listarPorId(@PathVariable Long pedidoId)  {
-		PedidoResponseDTO pedidoDTO = pedidoService.listarPorId(pedidoId);
-		return ResponseEntity.ok(pedidoDTO);
-	}
+  @Autowired
+  private PedidoModelAssembler pedidoModelAssembler;
 
-	@PostMapping
-	public ResponseEntity<PedidoResponseDTO> adicionar(@RequestBody PedidoRequestDTO produto) {
-		PedidoResponseDTO pedidoDTO = pedidoService.salvar(produto);
-		return ResponseEntity.status(HttpStatus.CREATED).body(pedidoDTO);
-	}
+  @Autowired
+  private PedidoResumoModelAssembler pedidoResumoModelAssembler;
 
-	@PutMapping("/{pedidoId}")
-	public ResponseEntity<PedidoResponseDTO> atualizar(@PathVariable Long pedidoId, @RequestBody PedidoRequestDTO produto) {
-		PedidoResponseDTO pedidoDTO = pedidoService.substituir(pedidoId, produto);
-		return ResponseEntity.ok(pedidoDTO);
-	}
+  @Autowired
+  private PedidoInputDisassembler pedidoInputDisassembler;
 
-	@DeleteMapping("/{pedidoId}")
-	public void remover(@PathVariable Long pedidoId) {
-		pedidoService.excluir(pedidoId);
-	}
+  @Autowired
+  private PagedResourcesAssembler<Pedido> pagedResourcesAssembler;
+
+  @Override
+  @GetMapping
+  public PagedModel<PedidoResumoModel> pesquisar(
+    PedidoFilter filtro,
+    @PageableDefault(size = 10) Pageable pageable
+  ) {
+    Pageable pageableTraduzido = traduzirPageable(pageable);
+
+    Page<Pedido> pedidosPage = pedidoRepository.findAll(
+      PedidoSpecs.usandoFiltro(filtro),
+      pageableTraduzido
+    );
+
+    pedidosPage = new PageWrapper<>(pedidosPage, pageable);
+
+    return pagedResourcesAssembler.toModel(
+      pedidosPage,
+      pedidoResumoModelAssembler
+    );
+  }
+
+  @Override
+  @PostMapping
+  @ResponseStatus(HttpStatus.CREATED)
+  public PedidoModel adicionar(@Valid @RequestBody PedidoInput pedidoInput) {
+    try {
+      Pedido novoPedido = pedidoInputDisassembler.toDomainObject(pedidoInput);
+
+      // TODO pegar usuário autenticado
+      novoPedido.setCliente(new Usuario());
+      novoPedido.getCliente().setId(1L);
+
+      novoPedido = emissaoPedido.emitir(novoPedido);
+
+      return pedidoModelAssembler.toModel(novoPedido);
+    } catch (EntidadeNaoEncontradaException e) {
+      throw new NegocioException(e.getMessage(), e);
+    }
+  }
+
+  @Override
+  @GetMapping("/{codigoPedido}")
+  public PedidoModel buscar(@PathVariable String codigoPedido) {
+    Pedido pedido = emissaoPedido.buscarOuFalhar(codigoPedido);
+
+    return pedidoModelAssembler.toModel(pedido);
+  }
+
+  private Pageable traduzirPageable(Pageable apiPageable) {
+    var mapeamento = Map.of(
+      "codigo",
+      "codigo",
+      "subtotal",
+      "subtotal",
+      "taxaFrete",
+      "taxaFrete",
+      "valorTotal",
+      "valorTotal",
+      "dataCriacao",
+      "dataCriacao",
+      "restaurante.nome",
+      "restaurante.nome",
+      "restaurante.id",
+      "restaurante.id",
+      "cliente.id",
+      "cliente.id",
+      "cliente.nome",
+      "cliente.nome"
+    );
+
+    return PageableTranslator.translate(apiPageable, mapeamento);
+  }
 }
+ */

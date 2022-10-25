@@ -1,106 +1,119 @@
 package com.ecommerce.domain.model;
 
-import java.util.Date;
+import java.math.BigDecimal;
+import java.time.OffsetDateTime;
+import java.util.ArrayList;
 import java.util.List;
-
-import javax.persistence.Column;
+import javax.persistence.CascadeType;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 
 @Data
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
 @Entity
-public class Pedido {
+public class Pedido /* extends AbstractAggregateRoot<Pedido> */{
 
-	@EqualsAndHashCode.Include
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id_pedido;
+  @EqualsAndHashCode.Include
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-	@Column(name="data_envio")
-	private Date dataEnvio;
+  private String codigo;
 
-	@Column(name="data_pedido")
-	private Date dataPedido;
+  private BigDecimal subtotal;
+  private BigDecimal taxaFrete;
+  private BigDecimal valorTotal;
 
-	@Column(name="data_entrega")
-	private Date dataEntrega;
-	
-	//Possível ENUM
-	@Column
-	private String status;
-	
-	@OneToOne
-	@JoinColumn(name = "id_cliente", referencedColumnName = "id_cliente" )
-	private Cliente cliente;
-	
-	@OneToMany(mappedBy = "pedido")	
-	private List<ItemPedido> itemPedido;	
+  @Embedded
+  private Endereco enderecoEntrega;
 
-	public Long getId_pedido() {
-		return id_pedido;
-	}
+  @Enumerated(EnumType.STRING)
+  private StatusPedido status = StatusPedido.CRIADO;
 
-	public void setId_pedido(Long id_pedido) {
-		this.id_pedido = id_pedido;
-	}
+  @CreationTimestamp
+  private OffsetDateTime dataCriacao;
 
-	public Date getDataEnvio() {
-		return dataEnvio;
-	}
+  private OffsetDateTime dataConfirmacao;
+  private OffsetDateTime dataCancelamento;
+  private OffsetDateTime dataEntrega;
 
-	public void setDataEnvio(Date dataEnvio) {
-		this.dataEnvio = dataEnvio;
-	}
+  @ManyToOne
+  @JoinColumn(name = "usuario_cliente_id", nullable = false)
+  private Cliente cliente;
 
-	public Date getDataPedido() {
-		return dataPedido;
-	}
+  @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL)
+  private List<ItemPedido> itens = new ArrayList<>();
 
-	public void setDataPedido(Date dataPedido) {
-		this.dataPedido = dataPedido;
-	}
+  public void calcularValorTotal() {
+    getItens().forEach(ItemPedido::calcularPrecoTotal);
 
-	public Date getDataEntrega() {
-		return dataEntrega;
-	}
+    this.subtotal =
+      getItens()
+        .stream()
+        .map(item -> item.getPrecoTotal())
+        .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-	public void setDataEntrega(Date dataEntrega) {
-		this.dataEntrega = dataEntrega;
-	}
+    this.valorTotal = this.subtotal.add(this.taxaFrete);
+  }
+  /* 
+  public void confirmar() {
+    setStatus(StatusPedido.CONFIRMADO);
+    setDataConfirmacao(OffsetDateTime.now());
 
-	public String getStatus() {
-		return status;
-	}
+    registerEvent(new PedidoConfirmadoEvent(this));
+  }
 
-	public void setStatus(String status) {
-		this.status = status;
-	}
+  public void entregar() {
+    setStatus(StatusPedido.ENTREGUE);
+    setDataEntrega(OffsetDateTime.now());
+  }
 
-	public Cliente getCliente() {
-		return cliente;
-	}
+  public void cancelar() {
+    setStatus(StatusPedido.CANCELADO);
+    setDataCancelamento(OffsetDateTime.now());
 
-	public void setCliente(Cliente cliente) {
-		this.cliente = cliente;
-	}
+    registerEvent(new PedidoCanceladoEvent(this));
+  } */
 
-	public List<ItemPedido> getItemPedido() {
-		return itemPedido;
-	}
+  /*   public boolean podeSerConfirmado() {
+    return getStatus().podeAlterarPara(StatusPedido.CONFIRMADO);
+  }
 
-	public void setItemPedido(List<ItemPedido> itemPedido) {
-		this.itemPedido = itemPedido;
-	}
+  public boolean podeSerEntregue() {
+    return getStatus().podeAlterarPara(StatusPedido.ENTREGUE);
+  }
 
+  public boolean podeSerCancelado() {
+    return getStatus().podeAlterarPara(StatusPedido.CANCELADO);
+  } */
+
+  /*   private void setStatus(StatusPedido novoStatus) {
+    if (getStatus().naoPodeAlterarPara(novoStatus)) {
+      throw new NegocioException(
+        String.format(
+          "Status do pedido %s não pode ser alterado de %s para %s",
+          getCodigo(),
+          getStatus().getDescricao(),
+          novoStatus.getDescricao()
+        )
+      );
+    }
+
+    this.status = novoStatus;
+  } */
+  /*   @PrePersist
+  private void gerarCodigo() {
+    setCodigo(UUID.randomUUID().toString());
+  } */
 }

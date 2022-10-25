@@ -4,11 +4,11 @@ import com.ecommerce.domain.exception.EntidadeEmUsoException;
 import com.ecommerce.domain.exception.EstadoNaoEncontradoException;
 import com.ecommerce.domain.model.Estado;
 import com.ecommerce.domain.repository.EstadoRepository;
-import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class EstadoService {

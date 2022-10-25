@@ -5,11 +5,11 @@ import com.ecommerce.domain.exception.EntidadeEmUsoException;
 import com.ecommerce.domain.model.Cidade;
 import com.ecommerce.domain.model.Estado;
 import com.ecommerce.domain.repository.CidadeRepository;
-import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class CidadeService {
@@ -21,13 +21,13 @@ public class CidadeService {
   private CidadeRepository cidadeRepository;
 
   @Autowired
-  private EstadoService cadastroEstado;
+  private EstadoService estadoService;
 
   @Transactional
   public Cidade salvar(Cidade cidade) {
     Long estadoId = cidade.getEstado().getId();
 
-    Estado estado = cadastroEstado.buscarOuFalhar(estadoId);
+    Estado estado = estadoService.buscarOuFalhar(estadoId);
 
     cidade.setEstado(estado);
 
