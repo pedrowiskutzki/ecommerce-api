@@ -1,22 +1,22 @@
-package com.ecommerce.api.assembler;
+// package com.ecommerce.api.assembler;
 
-import com.ecommerce.api.model.input.EstadoInput;
-import com.ecommerce.domain.model.Estado;
-import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+// import com.ecommerce.api.model.input.EstadoInput;
+// import com.ecommerce.domain.model.Estado;
+// import org.modelmapper.ModelMapper;
+// import org.springframework.beans.factory.annotation.Autowired;
+// import org.springframework.stereotype.Component;
 
-@Component
-public class EstadoInputDisassembler {
+// @Component
+// public class EstadoInputDisassembler {
 
-  @Autowired
-  private ModelMapper modelMapper;
+//   @Autowired
+//   private ModelMapper modelMapper;
 
-  public Estado toDomainObject(EstadoInput estadoInput) {
-    return modelMapper.map(estadoInput, Estado.class);
-  }
+//   public Estado toDomainObject(EstadoInput estadoInput) {
+//     return modelMapper.map(estadoInput, Estado.class);
+//   }
 
-  public void copyToDomainObject(EstadoInput estadoInput, Estado estado) {
-    modelMapper.map(estadoInput, estado);
-  }
-}
+//   public void copyToDomainObject(EstadoInput estadoInput, Estado estado) {
+//     modelMapper.map(estadoInput, estado);
+//   }
+// }

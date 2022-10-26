@@ -1,16 +1,9 @@
 package com.ecommerce.domain.repository;
 
+import org.springframework.data.jpa.repository.JpaRepository;
+
 import com.ecommerce.domain.model.Pedido;
-import java.util.List;
-import java.util.Optional;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-import org.springframework.stereotype.Repository;
 
-@Repository
-public interface PedidoRepository
-  extends CustomJpaRepository<Pedido, Long>, JpaSpecificationExecutor<Pedido> {
-  Optional<Pedido> findByCodigo(String codigo);
+public interface PedidoRepository extends JpaRepository<Pedido, Long> {
 
-  /*   @Query("from Pedido p join fetch p.cliente") */
-  List<Pedido> findAll();
 }

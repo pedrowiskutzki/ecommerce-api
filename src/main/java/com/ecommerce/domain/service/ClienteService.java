@@ -1,62 +1,139 @@
 package com.ecommerce.domain.service;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
-import javax.transaction.Transactional;
-
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.ecommerce.domain.exception.CategoriaNaoEncontradaException;
+import com.ecommerce.config.MailConfig;
 import com.ecommerce.domain.model.Cliente;
-import com.ecommerce.domain.model.dtos.ClienteDTO;
-import com.ecommerce.domain.model.mapper.ClienteMapper;
+import com.ecommerce.domain.model.Endereco;
+import com.ecommerce.domain.model.dto.ClienteDTO;
+import com.ecommerce.domain.model.dto.ClienteInserirDTO;
+import com.ecommerce.domain.model.dto.ClienteListDTO;
+import com.ecommerce.domain.model.dto.EnderecoDTO;
+import com.ecommerce.domain.model.dto.EnderecoInserirDTO;
 import com.ecommerce.domain.repository.ClienteRepository;
-
+import com.ecommerce.domain.service.exceptions.CpfException;
+import com.ecommerce.domain.service.exceptions.EmailException;
+import com.ecommerce.domain.service.exceptions.ResourceNotFoundException;
 
 @Service
 public class ClienteService {
 
-	@Autowired
-	private ClienteRepository clienteRepository;
+  @Autowired
+  private ClienteRepository clienteRepository;
 
-	@Autowired
-	private ClienteMapper clienteMapper;
+  @Autowired
+  private EnderecoService enderecoService;
 
-	@Transactional
-	public ClienteDTO salvar(ClienteDTO clienteDTO) {
-		Cliente cliente = clienteMapper.toModel(clienteDTO);
-		Cliente clienteSalvaNoBanco = clienteRepository.save(cliente);
-		return clienteMapper.toDTO(clienteSalvaNoBanco);
-	}
+  @Autowired
+  private MailConfig mailConfig;
 
-	@Transactional
-	public Cliente buscarOuFalhar(Long clienteId) {
-		
-		return clienteRepository.findById(clienteId)
-				.orElseThrow(() -> new CategoriaNaoEncontradaException(clienteId));
-	}
-	
-	public ClienteDTO listarPorId(Long id)  {
-		return clienteMapper.toDTO(buscarOuFalhar(id));
-	}
-	public List<ClienteDTO> listarTodos() {
-		return clienteRepository.findAll()
-			.stream()
-			.map(clienteMapper::toDTO)
-			.collect(Collectors.toList());
-	}
-	public ClienteDTO substituir(Long id, ClienteDTO clienteDTO) {
-		Cliente clienteNoBanco = buscarOuFalhar(id);
-		BeanUtils.copyProperties(clienteDTO, clienteNoBanco, "id");		
-		return clienteMapper.toDTO(clienteRepository.save(clienteNoBanco));
-	}
+  public List<ClienteListDTO> listar() {
+    List<Cliente> clientes = clienteRepository.findAll();
+    List<ClienteListDTO> clientesDTO = new ArrayList<>();
 
-	@Transactional
-	public void excluir(Long clienteId) {
-		buscarOuFalhar(clienteId);
-		clienteRepository.deleteById(clienteId);
-	}
+    for (Cliente cliente : clientes) {
+      clientesDTO.add(new ClienteListDTO(cliente));
+    }
+
+    return clientesDTO;
+  }
+
+  public ClienteListDTO buscar(Long id) {
+    Cliente clientes = clienteRepository.findById(id)
+        .orElseThrow(() -> new ResourceNotFoundException("Cliente nao econtrado"));
+
+    return new ClienteListDTO(clientes);
+  }
+
+  public ClienteDTO inserir(ClienteInserirDTO c) {
+
+    if (clienteRepository.findByEmail(c.getEmail()) != null) {
+      throw new EmailException("Email já existe na base");
+    }
+
+    if (clienteRepository.findByCpf(c.getCpf()) != null) {
+      throw new CpfException("CPF já cadastrado");
+    }
+
+    EnderecoInserirDTO endereco = c.getEndereco();
+    Endereco enderecoViaCep = enderecoService.salvar(endereco.getCep(), endereco.getComplemento(),
+        endereco.getNumero());
+
+    Cliente cliente = new Cliente();
+    cliente.setNomeCompleto(c.getNomeCompleto());
+    cliente.setEmail(c.getEmail());
+    cliente.setCpf(c.getCpf());
+    cliente.setDataNascimento(c.getDataNascimento());
+    cliente.setEndereco(enderecoViaCep);
+    cliente = clienteRepository.save(cliente);
+
+    return new ClienteDTO(cliente);
+  }
+
+  public ClienteDTO atualizar(Long id, ClienteInserirDTO clienteInserirDTO) {
+
+    clienteInserirDTO.setId(id);
+
+    // Buscando o cliente que vai ser atualizado
+    ClienteListDTO clientL = buscar(id);
+    // Buscando o endereço que vai ser atualizado do cliente
+    EnderecoDTO enderecoBuscarId = clientL.getEndereco();
+
+    // verifica no banco de pode ser alterado o email
+    if (clienteRepository.findByEmail(clienteInserirDTO.getEmail()) != null) {
+      if (!clienteRepository.findByEmail(clienteInserirDTO.getEmail()).getEmail().equals(clientL.getEmail())) {
+        throw new EmailException("Email já existe na base");
+      }
+    }
+
+    // não permite alteração do cpf do cliente
+    if (clienteRepository.findByCpf(clienteInserirDTO.getCpf()) != null) {
+      if (!clienteRepository.findByCpf(clienteInserirDTO.getCpf()).getCpf().equals(clientL.getCpf())) {
+        throw new CpfException("CPF não pode ser alterado");
+      }
+    }
+    if (clienteRepository.findByCpf(clienteInserirDTO.getCpf()) == null) {
+      throw new CpfException("CPF não pode ser alterado");
+    }
+
+    // Atualizando o endereço do cliente passando o id do endereço que foi achando
+    // acima e o dados novos
+    EnderecoInserirDTO endereco = clienteInserirDTO.getEndereco();
+    Endereco enderecoViaCep = enderecoService.atualizar(endereco.getCep(), endereco.getComplemento(),
+        endereco.getNumero(), enderecoBuscarId.getId());
+
+    // Cadastrando no banco de dados
+    Cliente novoCliente = new Cliente();
+    novoCliente.setId(clienteInserirDTO.getId());
+    novoCliente.setEmail(clienteInserirDTO.getEmail());
+
+    novoCliente.setNomeCompleto(clienteInserirDTO.getNomeCompleto());
+    novoCliente.setCpf(clienteInserirDTO.getCpf());
+
+    novoCliente.setDataNascimento(clienteInserirDTO.getDataNascimento());
+    novoCliente.setEndereco(enderecoViaCep);
+
+    novoCliente = clienteRepository.save(novoCliente);
+
+    // Enviando Email para notificar a mudança no cadastro
+    mailConfig.sendEmail(clienteInserirDTO.getEmail(), "Atualização de cadastro de Usuário",
+        novoCliente.toString());
+
+    return new ClienteDTO(novoCliente);
+  }
+
+  public Boolean delete(Long id) {
+    Optional<Cliente> cliente = clienteRepository.findById(id);
+
+    if (cliente.isPresent()) {
+      clienteRepository.deleteById(id);
+      return true;
+    }
+    return false;
+  }
 }

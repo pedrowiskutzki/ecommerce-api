@@ -201,8 +201,8 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
       "O parâmetro de URL '%s' recebeu o valor '%s', " +
       "que é de um tipo inválido. Corrija e informe um valor compatível com o tipo %s.",
       ex.getName(),
-      ex.getValue(),
-      ex.getRequiredType().getSimpleName()
+      ex.getValue()
+      //ex.getRequiredType().getSimpleName()
     );
 
     Problem problem = createProblemBuilder(status, problemType, detail)
@@ -360,7 +360,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
     );
   }
 
-  @Override
+/*   @Override
   protected ResponseEntity<Object> handleExceptionInternal(
     Exception ex,
     Object body,
@@ -389,7 +389,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     return super.handleExceptionInternal(ex, body, headers, status, request);
-  }
+  } */
 
   private Problem.ProblemBuilder createProblemBuilder(
     HttpStatus status,

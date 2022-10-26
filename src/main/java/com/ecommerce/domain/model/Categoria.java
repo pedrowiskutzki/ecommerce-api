@@ -1,31 +1,32 @@
 package com.ecommerce.domain.model;
 
+import java.util.ArrayList;
 import java.util.List;
-import javax.persistence.Column;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
+
 
 @Data
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
+@Table(name = "tb_categoria")
 public class Categoria {
-
-  @EqualsAndHashCode.Include
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id_categoria;
-
-  @Column(nullable = false)
+  private Long id;
+  @NotBlank
   private String nome;
-
-  @Column(nullable = false)
+  @Size(min = 7, max = 1000)
   private String descricao;
+  @OneToMany(mappedBy = "categoria", cascade = CascadeType.ALL)
+  private List<Produto> produto = new ArrayList<>();
 
-  @OneToMany(mappedBy = "categoria")
-  private List<Produto> produto;
 }

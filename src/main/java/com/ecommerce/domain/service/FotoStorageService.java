@@ -29,7 +29,7 @@ public interface FotoStorageService {
   class NovaFoto {
 
     private String nomeAquivo;
-    private InputStream inputStream;
+    private InputStream inputStream; //IputStream é o fluxo de entrada do arquivo.
   }
 
   @Builder

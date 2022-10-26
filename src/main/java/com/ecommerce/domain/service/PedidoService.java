@@ -1,124 +1,181 @@
-/* package com.ecommerce.domain.service;
+package com.ecommerce.domain.service;
 
-import com.ecommerce.domain.exception.CategoriaNaoEncontradaException;
-import com.ecommerce.domain.model.Cliente;
-import com.ecommerce.domain.model.MensagemEmail;
-import com.ecommerce.domain.model.Pedido;
-import com.ecommerce.domain.model.dtos.PedidoRequestDTO;
-import com.ecommerce.domain.model.dtos.PedidoResponseDTO;
-import com.ecommerce.domain.model.mapper.PedidoMapper;
-import com.ecommerce.domain.repository.ClienteRepository;
-import com.ecommerce.domain.repository.PedidoRepository;
-import java.util.ArrayList;
+import java.time.Instant;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+
+import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
-import org.springframework.beans.BeanUtils;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
+
+import com.ecommerce.config.MailConfig;
+import com.ecommerce.domain.model.Cliente;
+import com.ecommerce.domain.model.ItemPedido;
+import com.ecommerce.domain.model.Pedido;
+import com.ecommerce.domain.model.Produto;
+import com.ecommerce.domain.model.Status;
+import com.ecommerce.domain.model.dto.ItemPedidoDTO;
+import com.ecommerce.domain.model.dto.PedidoDTO;
+import com.ecommerce.domain.model.dto.RelatorioDTO;
+import com.ecommerce.domain.repository.ClienteRepository;
+import com.ecommerce.domain.repository.ItemPedidoRepository;
+import com.ecommerce.domain.repository.PedidoRepository;
+import com.ecommerce.domain.repository.ProdutoRepository;
+import com.ecommerce.domain.service.exceptions.DatabaseExcption;
+import com.ecommerce.domain.service.exceptions.QuantidadeException;
+import com.ecommerce.domain.service.exceptions.ResourceNotFoundException;
 
 @Service
 public class PedidoService {
 
   @Autowired
+  private ItemPedidoRepository itemPedidoRepository;
+
+  @Autowired
+  ClienteRepository clienteRepository;
+
+  @Autowired
   private PedidoRepository pedidoRepository;
 
   @Autowired
-  private ClienteRepository clienteRepository;
+  private ProdutoRepository produtoRepository;
 
   @Autowired
-  private EmailService emailService;
+  private MailConfig mailConfig;
 
-  @Autowired
-  private PedidoMapper pedidoMapper;
+  public PedidoDTO findById(Long id) {
 
-  @Transactional
-  public PedidoResponseDTO salvar(PedidoRequestDTO request) {
-    Pedido pedido = pedidoMapper.requestToModel(request);
+    Pedido pedido = pedidoRepository.findById(id)
+        .orElseThrow(() -> new ResourceNotFoundException("Pedido nao econtrado"));
+    PedidoDTO dto = new PedidoDTO(pedido);
+    return dto;
 
-    //		Pedido pedido = new Pedido();
-    //		pedido.setDataEntrega(request.getDataEntrega());
-    //		pedido.setDataEnvio(request.getDataEnvio());
-    //		pedido.setStatus(request.getStatus());
-    //		pedido.setCliente(request.getCliente());
-    pedido = pedidoRepository.save(pedido);
+  }
 
-    Optional<Cliente> cliente = clienteRepository.findById(
-      pedido.getCliente().getId_cliente()
-    );
-    var destinatarios = new ArrayList<String>();
-    destinatarios.add("mmatheusttavares@gmail.com"); //destinatario = cliente.getEmail()
-    String mensagem =
-      "<h1 style=\"color:red\",\"font-size:2rem\">  Novo pedido feito pelo cliente: " +
-      cliente.get().getNomeCompleto() +
-      " </h1> " +
-      "<h2>Dados do cliente:</h2>" +
-      "<ul><li>E-mail:" +
-      cliente.get().getEmail() +
-      "</li>" +
-      "<li>CPF:" +
-      cliente.get().getCpf() +
-      "</li>" +
-      "<li>Telefone:" +
-      cliente.get().getTelefone() +
-      "</li></ul>" +
-      "<li>Data de Nascimento:" +
-      cliente.get().getDataNascimento() +
-      "</li></ul>" +
-      "<h2>Dados do pedido:</h2>" +
-      "<ul><li>Status:" +
-      pedido.getStatus() +
-      "</li>" +
-      "<li>Data do pedido:" +
-      pedido.getDataPedido() +
-      "</li>" +
-      "<li>Data de envio:" +
-      pedido.getDataEnvio() +
-      "</li>";
-
-    MensagemEmail email = new MensagemEmail(
-      "Novo pedido criado.",
-      mensagem,
-      "email@gmail.com",
-      destinatarios
-    );
-
-    emailService.enviar(email);
-
-    return pedidoMapper.modelToResponse(pedido);
+  public List<PedidoDTO> findAll() {
+    List<Pedido> result = pedidoRepository.findAll();
+    return result.stream().map(x -> new PedidoDTO(x)).toList();
   }
 
   @Transactional
-  public Pedido buscarOuFalhar(Long pedidoId) {
-    return pedidoRepository
-      .findById(pedidoId)
-      .orElseThrow(() -> new CategoriaNaoEncontradaException(pedidoId));
+  public PedidoDTO insert(PedidoDTO pedidoDTO) {
+
+    Pedido pedido = new Pedido();
+    Cliente cliente = clienteRepository.getReferenceById(pedidoDTO.getClient().getId());
+
+    for (ItemPedidoDTO itemDTO : pedidoDTO.getItems()) {
+
+      Produto produto = produtoRepository.getReferenceById(itemDTO.getProdutoId());
+      ItemPedido item = new ItemPedido(produto, pedido, itemDTO.getQuantidade(), produto.getValorUnitario(),
+          itemDTO.getPercentualDesconto());
+
+      /* item.setValorBruto(); */
+      /*
+       * item.setValorBruto(produto.getValorUnitario() * itemDTO.getQuantidade());
+       * item.setValorLiquido(produto.getValorUnitario() * itemDTO.getQuantidade()
+       * - (item.getPercentualDesconto() * (produto.getValorUnitario() *
+       * itemDTO.getQuantidade()) / 100));
+       * 
+       * 
+       */
+
+      pedido.getItems().add(item);
+
+      item.setValorBrutoz(item.getValorBruto());
+      item.setValorLiquidoz(item.getValorLiquido());
+      if (item.getProduto().getQtdEstoque() < item.getQuantidade()) {
+        throw new QuantidadeException(
+            "Quantidade de produtos e superior a quantidade no estoque digite um quantidade menor");
+      } else {
+        item.getProduto().setQtdEstoque(item.getProduto().getQtdEstoque() - item.getQuantidade());
+      }
+
+    }
+
+    pedido.setDataEntrega(pedidoDTO.getDataEntrega());
+    pedido.setDataEnvio(pedidoDTO.getDataEnvio());
+    pedido.setValorTotal(pedido.getTotal());
+    pedido.setDataPedido(Instant.now());
+    pedido.setStatus(Status.DELIVERED);
+    pedido.setCliente(cliente);
+
+    pedidoRepository.save(pedido);
+    itemPedidoRepository.saveAll(pedido.getItems());
+
+    RelatorioDTO relatorio = new RelatorioDTO(pedido);
+    mailConfig.sendEmail(cliente.getEmail(), "Dados do Pedido",
+        relatorio.toString());
+
+    return new PedidoDTO(pedido);
+  }
+  /*
+   * @Transactional
+   * public PedidoDTO insert(PedidoDTO pedidoDTO) {
+   * 
+   * Pedido entity = new Pedido();
+   * 
+   * Cliente cliente =
+   * clienteRepository.getReferenceById(pedidoDTO.getClient().getId());
+   * 
+   * for (ItemPedidoDTO itemDTO : pedidoDTO.getItems()) {
+   * Produto produto = produtoRepository.getReferenceById(itemDTO.getProdutoId());
+   * ItemPedido item = new ItemPedido(produto, entity, itemDTO.getQuantidade(),
+   * itemDTO.getPrecoVenda());
+   * 
+   * entity.getItems().add(item);
+   * }
+   * 
+   * entity.setCliente(cliente);
+   * copyDtoToEntity(pedidoDTO, entity);
+   * itemPedidoRepository.saveAll(entity.getItems());
+   * entity = pedidoRepository.save(entity);
+   * 
+   * return new PedidoDTO(entity);
+   * }
+   */
+
+  public PedidoDTO update(PedidoDTO pedidoDto, Long id) {
+
+    try {
+      Pedido entity = pedidoRepository.findById(id)
+          .orElseThrow(() -> new ResourceNotFoundException("Pedido nao econtrado"));
+      copyDtoToEntity(pedidoDto, entity);
+      entity = pedidoRepository.save(entity);
+      return new PedidoDTO(entity);
+
+    } catch (
+
+    EntityNotFoundException e) {
+      throw new ResourceNotFoundException("Pedido nao econtrado");
+
+    }
+
   }
 
-  public PedidoResponseDTO listarPorId(Long id) {
-    return pedidoMapper.modelToResponse(buscarOuFalhar(id));
+  // @Transactional(propagation = Propagation.SUPPORTS)
+  public void deleteById(Long id) {
+
+    try {
+      pedidoRepository.deleteById(id);
+
+    } catch (EmptyResultDataAccessException e) {
+      throw new ResourceNotFoundException("Pedido nao econtrado");
+    } catch (DataIntegrityViolationException e) {
+      throw new DatabaseExcption("Falha de integridade Referencial");
+    }
+
   }
 
-  public List<PedidoResponseDTO> listarTodos() {
-    return pedidoRepository
-      .findAll()
-      .stream()
-      .map(pedidoMapper::modelToResponse)
-      .collect(Collectors.toList());
+  private void copyDtoToEntity(PedidoDTO pedidoDto, Pedido entity) {
+
+    entity.setDataEntrega(pedidoDto.getDataEntrega());
+    entity.setDataEnvio(pedidoDto.getDataEnvio());
+    entity.setDataPedido(Instant.now());
+    entity.setValorTotal(pedidoDto.getValorTotal());
+
   }
 
-  public PedidoResponseDTO substituir(Long id, PedidoRequestDTO pedidoDto) {
-    Pedido pedidoNoBanco = buscarOuFalhar(id);
-    Pedido pedido = pedidoMapper.requestToModel(pedidoDto);
-    BeanUtils.copyProperties(pedido, pedidoNoBanco, "id");
-    return pedidoMapper.modelToResponse(pedidoRepository.save(pedidoNoBanco));
-  }
-
-  @Transactional
-  public void excluir(Long pedidoId) {
-    buscarOuFalhar(pedidoId);
-    pedidoRepository.deleteById(pedidoId);
-  }
 }
- */

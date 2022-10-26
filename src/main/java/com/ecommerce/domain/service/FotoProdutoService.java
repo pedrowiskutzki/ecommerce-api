@@ -1,9 +1,10 @@
 package com.ecommerce.domain.service;
+/* package com.serratec.ecommerce.ecommerce.service;
 
-import com.ecommerce.domain.exception.FotoProdutoNaoEncontradoException;
-import com.ecommerce.domain.model.FotoProduto;
-import com.ecommerce.domain.repository.ProdutoRepository;
-import com.ecommerce.domain.service.FotoStorageService.NovaFoto;
+import com.api.cadastro_cliente.domain.exception.FotoClienteNaoEncontradaException;
+import com.api.cadastro_cliente.domain.model.FotoCliente;
+import com.api.cadastro_cliente.domain.repository.ClienteRepository;
+import com.api.cadastro_cliente.domain.service.FotoStorageService.NovaFoto;
 import java.io.InputStream;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,36 +12,35 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-public class FotoProdutoService {
+public class FotoClienteService {
 
   @Autowired
-  private ProdutoRepository produtoRepository;
+  private ClienteRepository clienteRepository;
 
   @Autowired
   private FotoStorageService fotoStorage;
 
   @Transactional
-  public FotoProduto salvar(FotoProduto foto, InputStream dadosArquivo) {
-    Long produtoId = foto.getProduto().getId();
+  public FotoCliente salvar(FotoCliente foto, InputStream dadosArquivo) {
+    Long clienteId = foto.getCliente().getId();
 
     String nomeNovoArquivo = fotoStorage.gerarNomeArquivo(
       foto.getNomeArquivo()
     );
-
     String nomeArquivoExistente = null;
 
-    Optional<FotoProduto> fotoExistente = produtoRepository.findFotoById(
-      produtoId
+    Optional<FotoCliente> fotoExistente = clienteRepository.findFotoById(
+      clienteId
     );
     if (fotoExistente.isPresent()) {
       nomeArquivoExistente = fotoExistente.get().getNomeArquivo();
-      produtoRepository.delete(fotoExistente.get());
+      clienteRepository.delete(fotoExistente.get());
     }
 
     foto.setNomeArquivo(nomeNovoArquivo);
 
-    foto = produtoRepository.save(foto);
-    produtoRepository.flush();
+    foto = clienteRepository.save(foto);
+    clienteRepository.flush();
 
     NovaFoto novaFoto = NovaFoto
       .builder()
@@ -54,18 +54,19 @@ public class FotoProdutoService {
   }
 
   @Transactional
-  public void excluir(Long produtoId) {
-    FotoProduto foto = buscarOuFalhar(produtoId);
+  public void excluir(Long clienteId) {
+    FotoCliente foto = buscarOuFalhar(clienteId);
 
-    produtoRepository.delete(foto);
-    produtoRepository.flush();
+    clienteRepository.delete(foto);
+    clienteRepository.flush();
 
     fotoStorage.remover(foto.getNomeArquivo());
   }
 
-  public FotoProduto buscarOuFalhar(Long produtoId) {
-    return produtoRepository
-      .findFotoById(produtoId)
-      .orElseThrow(() -> new FotoProdutoNaoEncontradoException(produtoId));
+  public FotoCliente buscarOuFalhar(Long clienteId) {
+    return clienteRepository
+      .findFotoById(clienteId)
+      .orElseThrow(() -> new FotoClienteNaoEncontradaException(clienteId));
   }
 }
+ */

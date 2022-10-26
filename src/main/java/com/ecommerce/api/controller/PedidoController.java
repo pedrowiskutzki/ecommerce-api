@@ -23,70 +23,60 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
-@RestController
-@RequestMapping("/pedidos")
-public class PedidoController {	
+    return pagedResourcesAssembler.toModel(
+      pedidosPage,
+      pedidoResumoModelAssembler
+    );
+  }
 
-	@Autowired
-	private PedidoService pedidoService;
+  @Override
+  @PostMapping
+  @ResponseStatus(HttpStatus.CREATED)
+  public PedidoModel adicionar(@Valid @RequestBody PedidoInput pedidoInput) {
+    try {
+      Pedido novoPedido = pedidoInputDisassembler.toDomainObject(pedidoInput);
 
-	@GetMapping
-	@ApiOperation(value="Lista todos os pedidos", notes="Listagem de Pedidos")
-	@ApiResponses(value= {	 
-	@ApiResponse(code=200, message="Retorna todos os pedidos"),	
-	@ApiResponse(code=505, message="Exceção interna da aplicação"),
-	})
-	public ResponseEntity<List<PedidoResponseDTO>> listar() {
-		return ResponseEntity.ok(pedidoService.listarTodos());
-	}
-	
-	@GetMapping("/{pedidoId}")
-	@ApiOperation(value="Listando um pedido por id", notes="Listagem de um pedido por id")
-	@ApiResponses(value= {	 
-	@ApiResponse(code=200, message="Retorna um pedido pelo id"),
-	@ApiResponse(code=404, message="Recurso não encontrado"),
-	@ApiResponse(code=505, message="Exceção interna da aplicação"),
-	})
-	public ResponseEntity<PedidoResponseDTO> listarPorId(@PathVariable Long pedidoId)  {
-		PedidoResponseDTO pedidoDTO = pedidoService.listarPorId(pedidoId);
-		return ResponseEntity.ok(pedidoDTO);
-	}
+      
+      novoPedido.setCliente(new Usuario());
+      novoPedido.getCliente().setId(1L);
 
-	@PostMapping
-	@ApiOperation(value="Cadastra um pedido ", notes="Cadatro de Pedidos")
-	@ApiResponses(value= {	 
-	@ApiResponse(code=201, message="Pedido cadastrado"),
-	@ApiResponse(code=500, message="Ocorreu um Erro na execução"),
-	@ApiResponse(code=505, message="Exceção interna da aplicação"),
-	})
-	public ResponseEntity<PedidoResponseDTO> adicionar(@RequestBody PedidoRequestDTO produto) {
-		PedidoResponseDTO pedidoDTO = pedidoService.salvar(produto);
-		return ResponseEntity.status(HttpStatus.CREATED).body(pedidoDTO);
-	}
+      novoPedido = emissaoPedido.emitir(novoPedido);
 
-	@PutMapping("/{pedidoId}")
-	@ApiOperation(value="Substitui um pedido pelo id", notes="Substitui Pedidos pelo id")
-	@ApiResponses(value= {	 
-	@ApiResponse(code=200, message="Modificações realizadas com sucesso"),
-	@ApiResponse(code=404, message="Recurso não encontrado"),
-	@ApiResponse(code=500, message="Ocorreu um Erro na execução"),
-	@ApiResponse(code=505, message="Exceção interna da aplicação"),
-	})
-	public ResponseEntity<PedidoResponseDTO> atualizar(@PathVariable Long pedidoId, @RequestBody PedidoRequestDTO produto) {
-		PedidoResponseDTO pedidoDTO = pedidoService.substituir(pedidoId, produto);
-		return ResponseEntity.ok(pedidoDTO);
-	}
+      return pedidoModelAssembler.toModel(novoPedido);
+    } catch (EntidadeNaoEncontradaException e) {
+      throw new NegocioException(e.getMessage(), e);
+    }
+  }
 
-	@DeleteMapping("/{pedidoId}")
-	@ApiOperation(value="Deleta um pedido pelo id", notes="Deleta Pedidos pelo id")
-	@ApiResponses(value= {	 
-	@ApiResponse(code=204, message="Pedido excluído"),
-	@ApiResponse(code=404, message="Recurso não encontrado"),
-	@ApiResponse(code=500, message="Ocorreu um Erro na execução"),
-	@ApiResponse(code=505, message="Exceção interna da aplicação"),
-	})
-	@ResponseStatus(HttpStatus.NO_CONTENT)
-	public void remover(@PathVariable Long pedidoId) {
-		pedidoService.excluir(pedidoId);
-	}
-}
+  @Override
+  @GetMapping("/{codigoPedido}")
+  public PedidoModel buscar(@PathVariable String codigoPedido) {
+    Pedido pedido = emissaoPedido.buscarOuFalhar(codigoPedido);
+
+    return pedidoModelAssembler.toModel(pedido);
+  }
+
+  private Pageable traduzirPageable(Pageable apiPageable) {
+    var mapeamento = Map.of(
+      "codigo",
+      "codigo",
+      "subtotal",
+      "subtotal",
+      "taxaFrete",
+      "taxaFrete",
+      "valorTotal",
+      "valorTotal",
+      "dataCriacao",
+      "dataCriacao",
+      "restaurante.nome",
+      "restaurante.nome",
+      "restaurante.id",
+      "restaurante.id",
+      "cliente.id",
+      "cliente.id",
+      "cliente.nome",
+      "cliente.nome"
+    );
+
+    return PageableTranslator.translate(apiPageable, mapeamento);
+  }
