@@ -1,31 +1,36 @@
 package com.ecommerce.domain.model.dto;
 
+import com.ecommerce.domain.model.ItemPedido;
+import com.ecommerce.domain.model.Pedido;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.validation.constraints.NotBlank;
-
-import com.ecommerce.domain.model.ItemPedido;
-import com.ecommerce.domain.model.Pedido;
 
 public class PedidoDTO {
 
   private Long id;
   private Instant dataPedido;
+
   @NotBlank(message = "O Campo e Obrigatorio")
   private String dataEntrega;
+
   @NotBlank(message = "O Campo e Obrigatorio")
   private String dataEnvio;
+
   private ClienteDTO client;
   private List<ItemPedidoDTO> items = new ArrayList<>();
   private Double valorTotal;
 
-  public PedidoDTO() {
-  }
+  public PedidoDTO() {}
 
-  public PedidoDTO(Long id, String dataEntrega, String dataEnvio, ClienteDTO client,
-      Double valorTotal) {
+  public PedidoDTO(
+    Long id,
+    String dataEntrega,
+    String dataEnvio,
+    ClienteDTO client,
+    Double valorTotal
+  ) {
     this.id = id;
     this.dataEntrega = dataEntrega;
     this.dataEnvio = dataEnvio;
@@ -45,9 +50,7 @@ public class PedidoDTO {
       ItemPedidoDTO itemDTO = new ItemPedidoDTO(item);
 
       items.add(itemDTO);
-
     }
-
   }
 
   public Instant getDataPedido() {
@@ -105,5 +108,4 @@ public class PedidoDTO {
   public List<ItemPedidoDTO> getItems() {
     return this.items;
   }
-
 }

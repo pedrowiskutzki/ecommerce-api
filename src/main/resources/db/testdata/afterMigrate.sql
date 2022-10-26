@@ -1,11 +1,11 @@
 -- Deletando os dados de testes das tabelas
-TRUNCATE TABLE categoria RESTART IDENTITY CASCADE;
+/* TRUNCATE TABLE categoria RESTART IDENTITY CASCADE;
 TRUNCATE TABLE cliente RESTART IDENTITY CASCADE;
 TRUNCATE TABLE endereco RESTART IDENTITY CASCADE;
 TRUNCATE TABLE item_pedido RESTART IDENTITY CASCADE;
 TRUNCATE TABLE pedido RESTART IDENTITY CASCADE;
 TRUNCATE TABLE produto RESTART IDENTITY CASCADE;
-TRUNCATE TABLE foto_produto RESTART IDENTITY CASCADE;
+TRUNCATE TABLE foto_produto RESTART IDENTITY CASCADE; */
 /*
 
 -- Inserindo dados na tabela cliente
@@ -34,7 +34,7 @@ INSERT INTO endereco (cep, rua, numero, complemento, bairro, celular, telefone, 
 VALUES ('78554-335', 'rua Cândido Portinari', 67, 'B', 'Mosela', '(24)98108-0205', 5);
 */
 -- Inserindo dados na tabela categoria
-INSERT INTO categoria (nome, descricao)
+/* INSERT INTO categoria (nome, descricao)
 VALUES ('Teclados', 'Teclados de várias marcas');
 INSERT INTO categoria (nome, descricao)
 VALUES ('Mouses', 'Mouses de vários modelos e marcas');
@@ -43,7 +43,7 @@ VALUES ('Headset Gamer', 'Headset de vários modelos e marcas (específicos para
 INSERT INTO categoria (nome, descricao)
 VALUES ('Webcam', 'Webcams de alta resolução');
 INSERT INTO categoria (nome, descricao)
-VALUES ('Gabinetes', 'Gabinetes diversos');
+VALUES ('Gabinetes', 'Gabinetes diversos'); */
 /*
 -- Inserindo dados na tabela produto
 INSERT INTO produto (nome, descricao, qtd_estoque, data_fabricacao, valor_unitario, id_categoria)

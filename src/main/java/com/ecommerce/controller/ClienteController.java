@@ -1,10 +1,17 @@
 package com.ecommerce.controller;
 
+import com.ecommerce.domain.exception.CpfException;
+import com.ecommerce.domain.exception.EmailException;
+import com.ecommerce.domain.model.dto.ClienteDTO;
+import com.ecommerce.domain.model.dto.ClienteInserirDTO;
+import com.ecommerce.domain.model.dto.ClienteListDTO;
+import com.ecommerce.domain.service.ClienteService;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import java.net.URI;
 import java.util.List;
-
 import javax.validation.Valid;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,17 +25,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import com.ecommerce.domain.model.dto.ClienteDTO;
-import com.ecommerce.domain.model.dto.ClienteInserirDTO;
-import com.ecommerce.domain.model.dto.ClienteListDTO;
-import com.ecommerce.domain.service.ClienteService;
-import com.ecommerce.domain.service.exceptions.CpfException;
-import com.ecommerce.domain.service.exceptions.EmailException;
-
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-
 @SecurityRequirement(name = "Bearer Authentication")
 @RestController
 @RequestMapping("/clientes")
@@ -38,25 +34,47 @@ public class ClienteController {
   private ClienteService clienteService;
 
   @GetMapping
-  @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "Retorna todos os clientes"),
+  @ApiResponses(
+    value = {
+      @ApiResponse(
+        responseCode = "200",
+        description = "Retorna todos os clientes"
+      ),
       @ApiResponse(responseCode = "401", description = "Erro de autenticação"),
-      @ApiResponse(responseCode = "403", description = "Você não tem permissão para o recurso"),
-      @ApiResponse(responseCode = "404", description = "Cliente não encontrado"),
-      @ApiResponse(responseCode = "500", description = "Erro na aplicação")
-  })
+      @ApiResponse(
+        responseCode = "403",
+        description = "Você não tem permissão para o recurso"
+      ),
+      @ApiResponse(
+        responseCode = "404",
+        description = "Cliente não encontrado"
+      ),
+      @ApiResponse(responseCode = "500", description = "Erro na aplicação"),
+    }
+  )
   public ResponseEntity<List<ClienteListDTO>> listar() {
     return ResponseEntity.ok(clienteService.listar());
   }
 
   @GetMapping("{id}")
-  @ApiResponses(value = {
-      @ApiResponse(responseCode = "200", description = "Retorna cliente do id referenciado"),
+  @ApiResponses(
+    value = {
+      @ApiResponse(
+        responseCode = "200",
+        description = "Retorna cliente do id referenciado"
+      ),
       @ApiResponse(responseCode = "401", description = "Erro de autenticação"),
-      @ApiResponse(responseCode = "403", description = "Você não tem permissão para o recurso"),
-      @ApiResponse(responseCode = "404", description = "Cliente não encontrado"),
-      @ApiResponse(responseCode = "500", description = "Erro na aplicação")
-  })
+      @ApiResponse(
+        responseCode = "403",
+        description = "Você não tem permissão para o recurso"
+      ),
+      @ApiResponse(
+        responseCode = "404",
+        description = "Cliente não encontrado"
+      ),
+      @ApiResponse(responseCode = "500", description = "Erro na aplicação"),
+    }
+  )
   public ResponseEntity<ClienteListDTO> buscar(@PathVariable Long id) {
     ClienteListDTO cliente = clienteService.buscar(id);
 
@@ -68,19 +86,38 @@ public class ClienteController {
   }
 
   @PostMapping
-  @ApiResponses(value = {
-      @ApiResponse(responseCode = "201", description = "Retorna o cliente cadastrado"),
+  @ApiResponses(
+    value = {
+      @ApiResponse(
+        responseCode = "201",
+        description = "Retorna o cliente cadastrado"
+      ),
       @ApiResponse(responseCode = "401", description = "Erro de autenticação"),
-      @ApiResponse(responseCode = "403", description = "Você não tem permissão para o recurso"),
-      @ApiResponse(responseCode = "422", description = "Você credencias já cadastradas no banco de dados"),
-      @ApiResponse(responseCode = "404", description = "Cliente não encontrado"),
-      @ApiResponse(responseCode = "500", description = "Erro na aplicação")
-  })
-  public ResponseEntity<Object> inserir(@Valid @RequestBody ClienteInserirDTO cliente) {
+      @ApiResponse(
+        responseCode = "403",
+        description = "Você não tem permissão para o recurso"
+      ),
+      @ApiResponse(
+        responseCode = "422",
+        description = "Você credencias já cadastradas no banco de dados"
+      ),
+      @ApiResponse(
+        responseCode = "404",
+        description = "Cliente não encontrado"
+      ),
+      @ApiResponse(responseCode = "500", description = "Erro na aplicação"),
+    }
+  )
+  public ResponseEntity<Object> inserir(
+    @Valid @RequestBody ClienteInserirDTO cliente
+  ) {
     try {
       ClienteDTO clienteDTO = clienteService.inserir(cliente);
-      URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(clienteDTO.getId())
-          .toUri();
+      URI uri = ServletUriComponentsBuilder
+        .fromCurrentRequest()
+        .path("/{id}")
+        .buildAndExpand(clienteDTO.getId())
+        .toUri();
       return ResponseEntity.created(uri).body(clienteDTO);
     } catch (EmailException | CpfException e) {
       return ResponseEntity.unprocessableEntity().body(e.getMessage());
@@ -88,24 +125,42 @@ public class ClienteController {
   }
 
   @PutMapping("{id}")
-  @ApiResponses(value = {
-      @ApiResponse(responseCode = "201", description = "Retorna o cliente cadastrado"),
+  @ApiResponses(
+    value = {
+      @ApiResponse(
+        responseCode = "201",
+        description = "Retorna o cliente cadastrado"
+      ),
       @ApiResponse(responseCode = "401", description = "Erro de autenticação"),
-      @ApiResponse(responseCode = "403", description = "Você não tem permissão para o recurso"),
-      @ApiResponse(responseCode = "422", description = "Você credencias já cadastradas no banco de dados"),
-      @ApiResponse(responseCode = "404", description = "Cliente não encontrado"),
-      @ApiResponse(responseCode = "500", description = "Erro na aplicação")
-  })
-  public ResponseEntity<Object> atualizar(@Valid @RequestBody ClienteInserirDTO cliente, @PathVariable Long id) {
-
+      @ApiResponse(
+        responseCode = "403",
+        description = "Você não tem permissão para o recurso"
+      ),
+      @ApiResponse(
+        responseCode = "422",
+        description = "Você credencias já cadastradas no banco de dados"
+      ),
+      @ApiResponse(
+        responseCode = "404",
+        description = "Cliente não encontrado"
+      ),
+      @ApiResponse(responseCode = "500", description = "Erro na aplicação"),
+    }
+  )
+  public ResponseEntity<Object> atualizar(
+    @Valid @RequestBody ClienteInserirDTO cliente,
+    @PathVariable Long id
+  ) {
     ClienteListDTO c = clienteService.buscar(id);
 
     if (c != null) {
       try {
         ClienteDTO clienteDTO = clienteService.atualizar(id, cliente);
-        URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
-            .buildAndExpand(clienteDTO.getId())
-            .toUri();
+        URI uri = ServletUriComponentsBuilder
+          .fromCurrentRequest()
+          .path("/{id}")
+          .buildAndExpand(clienteDTO.getId())
+          .toUri();
         return ResponseEntity.created(uri).body(clienteDTO);
       } catch (EmailException | CpfException e) {
         return ResponseEntity.unprocessableEntity().body(e.getMessage());
@@ -116,22 +171,27 @@ public class ClienteController {
   }
 
   @DeleteMapping("{id}")
-  @ApiResponses(value = {
+  @ApiResponses(
+    value = {
       @ApiResponse(responseCode = "204", description = "Deletado com sucesso"),
       @ApiResponse(responseCode = "401", description = "Erro de autenticação"),
-      @ApiResponse(responseCode = "403", description = "Você não tem permissão para o recurso"),
-      @ApiResponse(responseCode = "404", description = "Cliente não encontrado"),
-      @ApiResponse(responseCode = "500", description = "Erro na aplicação")
-  })
+      @ApiResponse(
+        responseCode = "403",
+        description = "Você não tem permissão para o recurso"
+      ),
+      @ApiResponse(
+        responseCode = "404",
+        description = "Cliente não encontrado"
+      ),
+      @ApiResponse(responseCode = "500", description = "Erro na aplicação"),
+    }
+  )
   public ResponseEntity<?> delete(@PathVariable Long id) {
-
     Boolean response = clienteService.delete(id);
     if (response != true) {
       return ResponseEntity.notFound().build();
     }
 
     return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-
   }
-
 }

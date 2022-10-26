@@ -1,4 +1,4 @@
-package com.ecommerce.api.controller;
+/* package com.ecommerce.api.controller;
 
 import java.util.List;
 
@@ -79,4 +79,4 @@ import io.swagger.annotations.ApiResponses;
     );
 
     return PageableTranslator.translate(apiPageable, mapeamento);
-  }
+  } */

@@ -1,10 +1,6 @@
-/* package com.ecommerce.core.storage;
+package com.ecommerce.core.storage;
 
-import com.ecommerce.core.storage.StorageProperties.TipoStorage;
-import com.ecommerce.domain.service.FotoStorageService;
-import com.ecommerce.infra.service.storage.LocalFotoStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
@@ -12,9 +8,8 @@ public class StorageConfig {
 
   @Autowired
   private StorageProperties storageProperties;
-
-  	@Bean
-  	@ConditionalOnProperty(name = "apidelivery.storage.tipo", havingValue = "s3")
+  /* 	@Bean
+  	@ConditionalOnProperty(name = "ecommerce.storage.tipo", havingValue = "s3")
   	public AmazonS3 amazonS3() {
   		var credentials = new BasicAWSCredentials(
   				storageProperties.getS3().getIdChaveAcesso(),
@@ -34,6 +29,5 @@ public class StorageConfig {
       return new LocalFotoStorageService();
     }
     return null;
-  }
+  } */
 }
- */

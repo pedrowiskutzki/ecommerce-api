@@ -1,17 +1,9 @@
 package com.ecommerce.domain.service;
 
-import java.time.Instant;
-import java.util.List;
-
-import javax.persistence.EntityNotFoundException;
-import javax.transaction.Transactional;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.stereotype.Service;
-
-import com.ecommerce.config.MailConfig;
+import com.ecommerce.core.email.MailConfig;
+import com.ecommerce.domain.exception.DatabaseExcption;
+import com.ecommerce.domain.exception.QuantidadeException;
+import com.ecommerce.domain.exception.ResourceNotFoundException;
 import com.ecommerce.domain.model.Cliente;
 import com.ecommerce.domain.model.ItemPedido;
 import com.ecommerce.domain.model.Pedido;
@@ -24,9 +16,14 @@ import com.ecommerce.domain.repository.ClienteRepository;
 import com.ecommerce.domain.repository.ItemPedidoRepository;
 import com.ecommerce.domain.repository.PedidoRepository;
 import com.ecommerce.domain.repository.ProdutoRepository;
-import com.ecommerce.domain.service.exceptions.DatabaseExcption;
-import com.ecommerce.domain.service.exceptions.QuantidadeException;
-import com.ecommerce.domain.service.exceptions.ResourceNotFoundException;
+import java.time.Instant;
+import java.util.List;
+import javax.persistence.EntityNotFoundException;
+import javax.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.stereotype.Service;
 
 @Service
 public class PedidoService {
@@ -47,12 +44,11 @@ public class PedidoService {
   private MailConfig mailConfig;
 
   public PedidoDTO findById(Long id) {
-
-    Pedido pedido = pedidoRepository.findById(id)
-        .orElseThrow(() -> new ResourceNotFoundException("Pedido nao econtrado"));
+    Pedido pedido = pedidoRepository
+      .findById(id)
+      .orElseThrow(() -> new ResourceNotFoundException("Pedido nao econtrado"));
     PedidoDTO dto = new PedidoDTO(pedido);
     return dto;
-
   }
 
   public List<PedidoDTO> findAll() {
@@ -62,15 +58,22 @@ public class PedidoService {
 
   @Transactional
   public PedidoDTO insert(PedidoDTO pedidoDTO) {
-
     Pedido pedido = new Pedido();
-    Cliente cliente = clienteRepository.getReferenceById(pedidoDTO.getClient().getId());
+    Cliente cliente = clienteRepository.getReferenceById(
+      pedidoDTO.getClient().getId()
+    );
 
     for (ItemPedidoDTO itemDTO : pedidoDTO.getItems()) {
-
-      Produto produto = produtoRepository.getReferenceById(itemDTO.getProdutoId());
-      ItemPedido item = new ItemPedido(produto, pedido, itemDTO.getQuantidade(), produto.getValorUnitario(),
-          itemDTO.getPercentualDesconto());
+      Produto produto = produtoRepository.getReferenceById(
+        itemDTO.getProdutoId()
+      );
+      ItemPedido item = new ItemPedido(
+        produto,
+        pedido,
+        itemDTO.getQuantidade(),
+        produto.getValorUnitario(),
+        itemDTO.getPercentualDesconto()
+      );
 
       /* item.setValorBruto(); */
       /*
@@ -78,8 +81,8 @@ public class PedidoService {
        * item.setValorLiquido(produto.getValorUnitario() * itemDTO.getQuantidade()
        * - (item.getPercentualDesconto() * (produto.getValorUnitario() *
        * itemDTO.getQuantidade()) / 100));
-       * 
-       * 
+       *
+       *
        */
 
       pedido.getItems().add(item);
@@ -88,11 +91,15 @@ public class PedidoService {
       item.setValorLiquidoz(item.getValorLiquido());
       if (item.getProduto().getQtdEstoque() < item.getQuantidade()) {
         throw new QuantidadeException(
-            "Quantidade de produtos e superior a quantidade no estoque digite um quantidade menor");
+          "Quantidade de produtos e superior a quantidade no estoque digite um quantidade menor"
+        );
       } else {
-        item.getProduto().setQtdEstoque(item.getProduto().getQtdEstoque() - item.getQuantidade());
+        item
+          .getProduto()
+          .setQtdEstoque(
+            item.getProduto().getQtdEstoque() - item.getQuantidade()
+          );
       }
-
     }
 
     pedido.setDataEntrega(pedidoDTO.getDataEntrega());
@@ -106,76 +113,71 @@ public class PedidoService {
     itemPedidoRepository.saveAll(pedido.getItems());
 
     RelatorioDTO relatorio = new RelatorioDTO(pedido);
-    mailConfig.sendEmail(cliente.getEmail(), "Dados do Pedido",
-        relatorio.toString());
+    mailConfig.sendEmail(
+      cliente.getEmail(),
+      "Dados do Pedido",
+      relatorio.toString()
+    );
 
     return new PedidoDTO(pedido);
   }
+
   /*
    * @Transactional
    * public PedidoDTO insert(PedidoDTO pedidoDTO) {
-   * 
+   *
    * Pedido entity = new Pedido();
-   * 
+   *
    * Cliente cliente =
    * clienteRepository.getReferenceById(pedidoDTO.getClient().getId());
-   * 
+   *
    * for (ItemPedidoDTO itemDTO : pedidoDTO.getItems()) {
    * Produto produto = produtoRepository.getReferenceById(itemDTO.getProdutoId());
    * ItemPedido item = new ItemPedido(produto, entity, itemDTO.getQuantidade(),
    * itemDTO.getPrecoVenda());
-   * 
+   *
    * entity.getItems().add(item);
    * }
-   * 
+   *
    * entity.setCliente(cliente);
    * copyDtoToEntity(pedidoDTO, entity);
    * itemPedidoRepository.saveAll(entity.getItems());
    * entity = pedidoRepository.save(entity);
-   * 
+   *
    * return new PedidoDTO(entity);
    * }
    */
 
   public PedidoDTO update(PedidoDTO pedidoDto, Long id) {
-
     try {
-      Pedido entity = pedidoRepository.findById(id)
-          .orElseThrow(() -> new ResourceNotFoundException("Pedido nao econtrado"));
+      Pedido entity = pedidoRepository
+        .findById(id)
+        .orElseThrow(
+          () -> new ResourceNotFoundException("Pedido nao econtrado")
+        );
       copyDtoToEntity(pedidoDto, entity);
       entity = pedidoRepository.save(entity);
       return new PedidoDTO(entity);
-
-    } catch (
-
-    EntityNotFoundException e) {
+    } catch (EntityNotFoundException e) {
       throw new ResourceNotFoundException("Pedido nao econtrado");
-
     }
-
   }
 
   // @Transactional(propagation = Propagation.SUPPORTS)
   public void deleteById(Long id) {
-
     try {
       pedidoRepository.deleteById(id);
-
     } catch (EmptyResultDataAccessException e) {
       throw new ResourceNotFoundException("Pedido nao econtrado");
     } catch (DataIntegrityViolationException e) {
       throw new DatabaseExcption("Falha de integridade Referencial");
     }
-
   }
 
   private void copyDtoToEntity(PedidoDTO pedidoDto, Pedido entity) {
-
     entity.setDataEntrega(pedidoDto.getDataEntrega());
     entity.setDataEnvio(pedidoDto.getDataEnvio());
     entity.setDataPedido(Instant.now());
     entity.setValorTotal(pedidoDto.getValorTotal());
-
   }
-
 }

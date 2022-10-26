@@ -1,12 +1,11 @@
 package com.ecommerce.domain.model.dto;
 
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-
 import com.ecommerce.domain.model.ItemPedido;
 import com.ecommerce.domain.model.Pedido;
 import com.ecommerce.domain.model.Status;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 public class RelatorioDTO {
 
@@ -17,10 +16,10 @@ public class RelatorioDTO {
   private ClienteDTO client;
   private List<ItemPedidoDTO> items = new ArrayList<>();
   private Double valorTotal;
+
   // private List<ItemPedido> item = new ArrayList<>();
 
   public RelatorioDTO(Pedido pedido) {
-
     this.dataPedido = pedido.getDataPedido();
     this.dataEntrega = pedido.getDataEntrega();
     this.dataEnvio = pedido.getDataEnvio();
@@ -31,7 +30,6 @@ public class RelatorioDTO {
       ItemPedidoDTO itemDTO = new ItemPedidoDTO(item);
 
       items.add(itemDTO);
-
     }
   }
 
@@ -93,13 +91,18 @@ public class RelatorioDTO {
 
   @Override
   public String toString() {
-    return "\nData do Pedido = " + getDataPedido() +
-        "\nData de Entrega = " + getDataEntrega() +
-        "\nData de Envio = " + getDataEnvio() +
-        "\nValor Total do Pedido = " + getValorTotal() +
-        "\n                      " +
-        "\nItems do Pedido  \n" + getItems().toString();
-
+    return (
+      "\nData do Pedido = " +
+      getDataPedido() +
+      "\nData de Entrega = " +
+      getDataEntrega() +
+      "\nData de Envio = " +
+      getDataEnvio() +
+      "\nValor Total do Pedido = " +
+      getValorTotal() +
+      "\n                      " +
+      "\nItems do Pedido  \n" +
+      getItems().toString()
+    );
   }
-
 }/*  */

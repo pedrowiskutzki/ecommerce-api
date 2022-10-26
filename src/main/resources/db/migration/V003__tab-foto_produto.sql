@@ -1,4 +1,4 @@
-create table foto_produto (
+/* create table foto_produto (
   id_foto_produto bigint not null,
   nome_arquivo varchar(150) not null,
   descricao varchar(150),
@@ -6,4 +6,4 @@ create table foto_produto (
   tamanho int not null,
   PRIMARY KEY (id_foto_produto),
   CONSTRAINT fk_foto_produto_produto FOREIGN KEY (id_foto_produto) REFERENCES produto (id_produto)
-)
+) */

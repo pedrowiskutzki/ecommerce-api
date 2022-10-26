@@ -1,4 +1,4 @@
-CREATE TABLE categoria (
+/* CREATE TABLE categoria (
   id_categoria SERIAL PRIMARY KEY,
   nome varchar(30) NOT NULL, 
   descricao varchar(150));
@@ -22,4 +22,4 @@ percentual_desconto INTEGER,
 valor_bruto INTEGER,
 valor_liquido INTEGER,
 id_pedido INTEGER, FOREIGN KEY (id_pedido) REFERENCES pedido(id_pedido),
-id_produto INTEGER,  FOREIGN KEY (id_produto) REFERENCES produto(id_produto));
+id_produto INTEGER,  FOREIGN KEY (id_produto) REFERENCES produto(id_produto)); */

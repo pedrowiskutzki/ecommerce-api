@@ -1,9 +1,8 @@
 package com.ecommerce.domain.model.dto;
 
-import java.time.LocalDate;
-
 import com.ecommerce.domain.model.Cliente;
 import com.ecommerce.domain.model.Endereco;
+import java.time.LocalDate;
 
 public class ClienteDTO {
 
@@ -14,11 +13,16 @@ public class ClienteDTO {
   private LocalDate dataNascimento;
   private Endereco endereco;
 
-  public ClienteDTO() {
-  }
+  public ClienteDTO() {}
 
-  public ClienteDTO(Long id, String email, String nomeCompleto, String cpf, LocalDate dataNascimento,
-      Endereco endereco) {
+  public ClienteDTO(
+    Long id,
+    String email,
+    String nomeCompleto,
+    String cpf,
+    LocalDate dataNascimento,
+    Endereco endereco
+  ) {
     this.id = id;
     this.email = email;
     this.nomeCompleto = nomeCompleto;
@@ -34,7 +38,6 @@ public class ClienteDTO {
     cpf = cliente.getCpf();
     dataNascimento = cliente.getDataNascimento();
     endereco = cliente.getEndereco();
-
   }
 
   public Long getId() {
@@ -84,5 +87,4 @@ public class ClienteDTO {
   public void setEndereco(Endereco endereco) {
     this.endereco = endereco;
   }
-
 }

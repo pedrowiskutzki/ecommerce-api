@@ -1,13 +1,19 @@
 package com.ecommerce.controller.handlers;
 
+import com.ecommerce.domain.exception.CpfException;
+import com.ecommerce.domain.exception.DatabaseExcption;
+import com.ecommerce.domain.exception.EmailException;
+import com.ecommerce.domain.exception.ErroResposta;
+import com.ecommerce.domain.exception.FindIdException;
+import com.ecommerce.domain.exception.QuantidadeException;
+import com.ecommerce.domain.exception.ResourceNotFoundException;
+import com.ecommerce.domain.model.dto.CustomError;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
-
 import javax.servlet.http.HttpServletRequest;
-
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -22,29 +28,36 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import com.ecommerce.domain.model.dto.CustomError;
-import com.ecommerce.domain.service.exceptions.CpfException;
-import com.ecommerce.domain.service.exceptions.DatabaseExcption;
-import com.ecommerce.domain.service.exceptions.EmailException;
-import com.ecommerce.domain.service.exceptions.ErroResposta;
-import com.ecommerce.domain.service.exceptions.FindIdException;
-import com.ecommerce.domain.service.exceptions.QuantidadeException;
-import com.ecommerce.domain.service.exceptions.ResourceNotFoundException;
-
 @ControllerAdvice
 public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
 
   @ExceptionHandler(ResourceNotFoundException.class)
-  public ResponseEntity<CustomError> resourceNotFound(ResourceNotFoundException e, HttpServletRequest request) {
+  public ResponseEntity<CustomError> resourceNotFound(
+    ResourceNotFoundException e,
+    HttpServletRequest request
+  ) {
     HttpStatus status = HttpStatus.NOT_FOUND;
-    CustomError err = new CustomError(Instant.now(), status.value(), e.getMessage(), request.getRequestURI());
+    CustomError err = new CustomError(
+      Instant.now(),
+      status.value(),
+      e.getMessage(),
+      request.getRequestURI()
+    );
     return ResponseEntity.status(status).body(err);
   }
 
   @ExceptionHandler(DatabaseExcption.class)
-  public ResponseEntity<CustomError> database(DatabaseExcption e, HttpServletRequest request) {
+  public ResponseEntity<CustomError> database(
+    DatabaseExcption e,
+    HttpServletRequest request
+  ) {
     HttpStatus status = HttpStatus.BAD_REQUEST;
-    CustomError err = new CustomError(Instant.now(), status.value(), e.getMessage(), request.getRequestURI());
+    CustomError err = new CustomError(
+      Instant.now(),
+      status.value(),
+      e.getMessage(),
+      request.getRequestURI()
+    );
     return ResponseEntity.status(status).body(err);
   }
 
@@ -57,7 +70,7 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
    * ValidationError err = new ValidationError(Instant.now(), status.value(),
    * "Dados invalidos",
    * request.getRequestURI());
-   * 
+   *
    * for (FieldError f : e.getBindingResult().getFieldErrors()) {
    * err.addError(f.getField(), f.getDefaultMessage());
    * }
@@ -66,7 +79,9 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
    */
   @ExceptionHandler(QuantidadeException.class)
   public ResponseEntity<Object> QuantidadeException(QuantidadeException ex) {
-    return ResponseEntity.unprocessableEntity().body("Verifique a quantidade informada");
+    return ResponseEntity
+      .unprocessableEntity()
+      .body("Verifique a quantidade informada");
   }
 
   @ExceptionHandler(EmailException.class)
@@ -88,48 +103,89 @@ public class ControllerExceptionHandler extends ResponseEntityExceptionHandler {
   }
 
   @ExceptionHandler(HttpClientErrorException.class)
-  public ResponseEntity<Object> handleHttpClientErrorException(HttpClientErrorException ex) {
+  public ResponseEntity<Object> handleHttpClientErrorException(
+    HttpClientErrorException ex
+  ) {
     return ResponseEntity.unprocessableEntity().body("Cep Inválido !");
   }
 
   @ExceptionHandler(MaxUploadSizeExceededException.class)
-  public ResponseEntity<Object> handleMaxSizeException(MaxUploadSizeExceededException exc) {
-    return ResponseEntity.unprocessableEntity().body("Aquivo muito poderoso, máximo suportado 1 MegaByte !");
+  public ResponseEntity<Object> handleMaxSizeException(
+    MaxUploadSizeExceededException exc
+  ) {
+    return ResponseEntity
+      .unprocessableEntity()
+      .body("Aquivo muito poderoso, máximo suportado 1 MegaByte !");
   }
 
   @ExceptionHandler(DataIntegrityViolationException.class)
-  public ResponseEntity<Object> DataIntegrityViolationException(DataIntegrityViolationException exc) {
-    return ResponseEntity.unprocessableEntity()
-        .body("Impossível realizar essa opção, violação de chave estrangeira ou violação no banco de dados !");
+  public ResponseEntity<Object> DataIntegrityViolationException(
+    DataIntegrityViolationException exc
+  ) {
+    return ResponseEntity
+      .unprocessableEntity()
+      .body(
+        "Impossível realizar essa opção, violação de chave estrangeira ou violação no banco de dados !"
+      );
   }
 
   @ExceptionHandler(NoSuchElementException.class)
-  public ResponseEntity<Object> NoSuchElementException(NoSuchElementException exc) {
-    return ResponseEntity.unprocessableEntity().body("Id não encontrado ou null");
+  public ResponseEntity<Object> NoSuchElementException(
+    NoSuchElementException exc
+  ) {
+    return ResponseEntity
+      .unprocessableEntity()
+      .body("Id não encontrado ou null");
   }
 
   @Override
-  protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
-      HttpHeaders headers, HttpStatus status, WebRequest request) {
+  protected ResponseEntity<Object> handleMethodArgumentNotValid(
+    MethodArgumentNotValidException ex,
+    HttpHeaders headers,
+    HttpStatus status,
+    WebRequest request
+  ) {
     List<String> erros = new ArrayList<>();
     for (FieldError erro : ex.getBindingResult().getFieldErrors()) {
       erros.add(erro.getField() + ":" + erro.getDefaultMessage());
     }
 
-    ErroResposta erroResposta = new ErroResposta(status.value(),
-        "Existem campos inválidos. Confira o preenchimento", LocalDateTime.now(), erros);
+    ErroResposta erroResposta = new ErroResposta(
+      status.value(),
+      "Existem campos inválidos. Confira o preenchimento",
+      LocalDateTime.now(),
+      erros
+    );
 
-    return super.handleExceptionInternal(ex, erroResposta, headers, status, request);
+    return super.handleExceptionInternal(
+      ex,
+      erroResposta,
+      headers,
+      status,
+      request
+    );
   }
 
   @Override
-  protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex,
-      HttpHeaders headers, HttpStatus status, WebRequest request) {
+  protected ResponseEntity<Object> handleHttpMessageNotReadable(
+    HttpMessageNotReadableException ex,
+    HttpHeaders headers,
+    HttpStatus status,
+    WebRequest request
+  ) {
+    ErroResposta erroResposta = new ErroResposta(
+      status.value(),
+      "Existem campos inválidos. Confira o preenchimento",
+      LocalDateTime.now(),
+      null
+    );
 
-    ErroResposta erroResposta = new ErroResposta(status.value(),
-        "Existem campos inválidos. Confira o preenchimento", LocalDateTime.now(), null);
-
-    return super.handleExceptionInternal(ex, erroResposta, headers, status, request);
+    return super.handleExceptionInternal(
+      ex,
+      erroResposta,
+      headers,
+      status,
+      request
+    );
   }
-
 }

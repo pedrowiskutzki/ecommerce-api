@@ -1,13 +1,10 @@
 package com.ecommerce.domain.model;
 
 import java.io.Serializable;
-
 import javax.persistence.Embeddable;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-
 import lombok.Data;
-
 
 @Embeddable
 @Data
@@ -21,8 +18,5 @@ public class ItemPedidoPk implements Serializable {
   @JoinColumn(name = "produto_id")
   private Produto produto;
 
-  public ItemPedidoPk() {
-  }
-
-
+  public ItemPedidoPk() {}
 }

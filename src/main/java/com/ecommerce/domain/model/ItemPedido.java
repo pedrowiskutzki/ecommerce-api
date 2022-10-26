@@ -1,7 +1,6 @@
 package com.ecommerce.domain.model;
 
 import java.io.Serializable;
-
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.Table;
@@ -22,16 +21,20 @@ public class ItemPedido implements Serializable {
   @EmbeddedId
   private ItemPedidoPk id = new ItemPedidoPk();
 
-  public ItemPedido() {
-  }
+  public ItemPedido() {}
 
-  public ItemPedido(Produto produto, Pedido pedido, Integer quantidade, Double precoVenda, Integer percentualDesconto) {
+  public ItemPedido(
+    Produto produto,
+    Pedido pedido,
+    Integer quantidade,
+    Double precoVenda,
+    Integer percentualDesconto
+  ) {
     id.setPedido(pedido);
     id.setProduto(produto);
     this.quantidade = quantidade;
     this.precoVenda = precoVenda; // produto.getValorUnitario();
     this.percentualDesconto = (quantidade > 30) ? 20 : 10;
-
   }
 
   public Double getValorBrutoz() {
@@ -99,11 +102,16 @@ public class ItemPedido implements Serializable {
   }
 
   public Double getValorLiquido() {
-    return (precoVenda * quantidade - percentualDesconto * (precoVenda * quantidade) / 100);
+    return (
+      precoVenda *
+      quantidade -
+      percentualDesconto *
+      (precoVenda * quantidade) /
+      100
+    );
   }
 
   public Double getValorBruto() {
     return precoVenda * quantidade;
   }
-
 }

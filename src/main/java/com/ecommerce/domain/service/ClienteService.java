@@ -1,13 +1,9 @@
 package com.ecommerce.domain.service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import com.ecommerce.config.MailConfig;
+import com.ecommerce.core.email.MailConfig;
+import com.ecommerce.domain.exception.CpfException;
+import com.ecommerce.domain.exception.EmailException;
+import com.ecommerce.domain.exception.ResourceNotFoundException;
 import com.ecommerce.domain.model.Cliente;
 import com.ecommerce.domain.model.Endereco;
 import com.ecommerce.domain.model.dto.ClienteDTO;
@@ -16,9 +12,11 @@ import com.ecommerce.domain.model.dto.ClienteListDTO;
 import com.ecommerce.domain.model.dto.EnderecoDTO;
 import com.ecommerce.domain.model.dto.EnderecoInserirDTO;
 import com.ecommerce.domain.repository.ClienteRepository;
-import com.ecommerce.domain.service.exceptions.CpfException;
-import com.ecommerce.domain.service.exceptions.EmailException;
-import com.ecommerce.domain.service.exceptions.ResourceNotFoundException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 @Service
 public class ClienteService {
@@ -44,14 +42,16 @@ public class ClienteService {
   }
 
   public ClienteListDTO buscar(Long id) {
-    Cliente clientes = clienteRepository.findById(id)
-        .orElseThrow(() -> new ResourceNotFoundException("Cliente nao econtrado"));
+    Cliente clientes = clienteRepository
+      .findById(id)
+      .orElseThrow(
+        () -> new ResourceNotFoundException("Cliente nao econtrado")
+      );
 
     return new ClienteListDTO(clientes);
   }
 
   public ClienteDTO inserir(ClienteInserirDTO c) {
-
     if (clienteRepository.findByEmail(c.getEmail()) != null) {
       throw new EmailException("Email já existe na base");
     }
@@ -61,8 +61,11 @@ public class ClienteService {
     }
 
     EnderecoInserirDTO endereco = c.getEndereco();
-    Endereco enderecoViaCep = enderecoService.salvar(endereco.getCep(), endereco.getComplemento(),
-        endereco.getNumero());
+    Endereco enderecoViaCep = enderecoService.salvar(
+      endereco.getCep(),
+      endereco.getComplemento(),
+      endereco.getNumero()
+    );
 
     Cliente cliente = new Cliente();
     cliente.setNomeCompleto(c.getNomeCompleto());
@@ -76,7 +79,6 @@ public class ClienteService {
   }
 
   public ClienteDTO atualizar(Long id, ClienteInserirDTO clienteInserirDTO) {
-
     clienteInserirDTO.setId(id);
 
     // Buscando o cliente que vai ser atualizado
@@ -86,14 +88,24 @@ public class ClienteService {
 
     // verifica no banco de pode ser alterado o email
     if (clienteRepository.findByEmail(clienteInserirDTO.getEmail()) != null) {
-      if (!clienteRepository.findByEmail(clienteInserirDTO.getEmail()).getEmail().equals(clientL.getEmail())) {
+      if (
+        !clienteRepository
+          .findByEmail(clienteInserirDTO.getEmail())
+          .getEmail()
+          .equals(clientL.getEmail())
+      ) {
         throw new EmailException("Email já existe na base");
       }
     }
 
     // não permite alteração do cpf do cliente
     if (clienteRepository.findByCpf(clienteInserirDTO.getCpf()) != null) {
-      if (!clienteRepository.findByCpf(clienteInserirDTO.getCpf()).getCpf().equals(clientL.getCpf())) {
+      if (
+        !clienteRepository
+          .findByCpf(clienteInserirDTO.getCpf())
+          .getCpf()
+          .equals(clientL.getCpf())
+      ) {
         throw new CpfException("CPF não pode ser alterado");
       }
     }
@@ -104,8 +116,12 @@ public class ClienteService {
     // Atualizando o endereço do cliente passando o id do endereço que foi achando
     // acima e o dados novos
     EnderecoInserirDTO endereco = clienteInserirDTO.getEndereco();
-    Endereco enderecoViaCep = enderecoService.atualizar(endereco.getCep(), endereco.getComplemento(),
-        endereco.getNumero(), enderecoBuscarId.getId());
+    Endereco enderecoViaCep = enderecoService.atualizar(
+      endereco.getCep(),
+      endereco.getComplemento(),
+      endereco.getNumero(),
+      enderecoBuscarId.getId()
+    );
 
     // Cadastrando no banco de dados
     Cliente novoCliente = new Cliente();
@@ -121,8 +137,11 @@ public class ClienteService {
     novoCliente = clienteRepository.save(novoCliente);
 
     // Enviando Email para notificar a mudança no cadastro
-    mailConfig.sendEmail(clienteInserirDTO.getEmail(), "Atualização de cadastro de Usuário",
-        novoCliente.toString());
+    mailConfig.sendEmail(
+      clienteInserirDTO.getEmail(),
+      "Atualização de cadastro de Usuário",
+      novoCliente.toString()
+    );
 
     return new ClienteDTO(novoCliente);
   }

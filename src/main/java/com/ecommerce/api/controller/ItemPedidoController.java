@@ -1,4 +1,4 @@
-package com.ecommerce.api.controller;
+/* package com.ecommerce.api.controller;
 
 import java.util.List;
 
@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ecommerce.domain.model.dtos.ItemPedidoDTO;
+import com.ecommerce.domain.model.dto.ItemPedidoDTO;
 import com.ecommerce.domain.service.ItemPedidoService;
 
 import io.swagger.annotations.ApiOperation;
@@ -89,3 +89,4 @@ public class ItemPedidoController {
 		itemPedidoService.excluir(itemPedidoId);
 	}
 }
+ */
