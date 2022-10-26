@@ -1,6 +1,5 @@
 package com.ecommerce.infra.service.storage;
 
-import com.ecommerce.domain.service.FotoStorageService;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -8,10 +7,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.FileCopyUtils;
 
+import com.ecommerce.domain.service.FotoStorageService;
+
 @Service
 public class LocalFotoStorageService implements FotoStorageService {
 
-  @Value("${cadastro_produto.storage.local.diretorio-fotos}")
+  @Value("${cadastro_cliente.storage.local.diretorio-fotos}")
   private Path diretorioFotos;
 
   @Override
@@ -28,7 +29,9 @@ public class LocalFotoStorageService implements FotoStorageService {
   @Override
   public void armazenar(NovaFoto novaFoto) {
     try {
+      
       Path arquivoPath = getArquivoPath(novaFoto.getNomeAquivo());
+      
       FileCopyUtils.copy(
         novaFoto.getInputStream(),
         Files.newOutputStream(arquivoPath)
@@ -41,6 +44,7 @@ public class LocalFotoStorageService implements FotoStorageService {
   @Override
   public void remover(String nomeArquivo) {
     try {
+    
       Path arquivoPath = getArquivoPath(nomeArquivo);
 
       Files.deleteIfExists(arquivoPath);

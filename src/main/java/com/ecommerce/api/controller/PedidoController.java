@@ -84,7 +84,7 @@ public class PedidoController implements PedidoControllerOpenApi {
     try {
       Pedido novoPedido = pedidoInputDisassembler.toDomainObject(pedidoInput);
 
-      // TODO pegar usuário autenticado
+      
       novoPedido.setCliente(new Usuario());
       novoPedido.getCliente().setId(1L);
 

@@ -1,6 +1,6 @@
 package com.ecommerce.core.storage;
 
-import java.nio.file.Path;
+//import java.nio.file.Path;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.stereotype.Component;
@@ -19,6 +19,6 @@ public class StorageProperties {
 
   public class Local {
 
-    private Path diretorioFotos;
+  //  private Path diretorioFotos;
   }
 }

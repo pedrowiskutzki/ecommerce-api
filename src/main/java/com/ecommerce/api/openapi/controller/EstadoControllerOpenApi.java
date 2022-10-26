@@ -1,4 +1,4 @@
-package com.ecommerce.api.openapi.controller;
+/* package com.ecommerce.api.openapi.controller;
 
 import com.ecommerce.api.exceptionhandler.Problem;
 import com.ecommerce.api.model.EstadoModel;
@@ -91,3 +91,4 @@ public interface EstadoControllerOpenApi {
     ) Long estadoId
   );
 }
+ */

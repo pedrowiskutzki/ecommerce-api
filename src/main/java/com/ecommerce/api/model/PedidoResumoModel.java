@@ -1,4 +1,4 @@
-package com.ecommerce.api.model;
+/* package com.ecommerce.api.model;
 
 import io.swagger.annotations.ApiModelProperty;
 import java.math.BigDecimal;
@@ -33,3 +33,4 @@ public class PedidoResumoModel extends RepresentationModel<PedidoResumoModel> {
 
   private ClienteModel cliente;
 }
+ */

@@ -1,10 +1,10 @@
-package com.ecommerce.api.model;
+/* package com.ecommerce.api.model;
 
 import io.swagger.annotations.ApiModelProperty;
 import java.math.BigDecimal;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.hateoas.RepresentationModel;
+
 
 @Getter
 @Setter
@@ -28,3 +28,4 @@ public class ItemPedidoModel extends RepresentationModel<ItemPedidoModel> {
   @ApiModelProperty(example = "Menos picante, por favor")
   private String observacao;
 }
+ */

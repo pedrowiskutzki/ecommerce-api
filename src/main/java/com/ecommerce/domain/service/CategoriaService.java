@@ -1,61 +1,90 @@
 package com.ecommerce.domain.service;
 
-import com.ecommerce.domain.exception.CategoriaNaoEncontradaException;
-import com.ecommerce.domain.model.Categoria;
-import com.ecommerce.domain.model.dtos.CategoriaDTO;
-import com.ecommerce.domain.model.mapper.CategoriaMapper;
-import com.ecommerce.domain.repository.CategoriaRepository;
 import java.util.List;
-import java.util.stream.Collectors;
+
+import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
-import org.springframework.beans.BeanUtils;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
+
+import com.ecommerce.domain.model.Categoria;
+import com.ecommerce.domain.model.dto.CategoriaDTO;
+import com.ecommerce.domain.repository.CategoriaRepository;
+import com.ecommerce.domain.service.exceptions.DatabaseExcption;
+import com.ecommerce.domain.service.exceptions.ResourceNotFoundException;
 
 @Service
 public class CategoriaService {
 
   @Autowired
-  private CategoriaRepository categoriaRepository;
+  CategoriaRepository categoriaRepository;
 
-  @Autowired
-  private CategoriaMapper categoriaMapper;
+  public CategoriaDTO findById(Long id) {
 
-  @Transactional
-  public CategoriaDTO salvar(CategoriaDTO categoriaDto) {
-    Categoria categoria = categoriaMapper.toModel(categoriaDto);
-    Categoria categoriaSalvaNoBanco = categoriaRepository.save(categoria);
-    return categoriaMapper.toDto(categoriaSalvaNoBanco);
+    Categoria categoria = categoriaRepository.findById(id)
+        .orElseThrow(() -> new ResourceNotFoundException("Categoria nao econtrada"));
+    CategoriaDTO dto = new CategoriaDTO(categoria);
+    return dto;
+
+  }
+
+  public List<CategoriaDTO> findAll() {
+    List<Categoria> result = categoriaRepository.findAll();
+    return result.stream().map(x -> new CategoriaDTO(x)).toList();
   }
 
   @Transactional
-  public Categoria buscarOuFalhar(Long categoriaId) {
-    return categoriaRepository
-      .findById(categoriaId)
-      .orElseThrow(() -> new CategoriaNaoEncontradaException(categoriaId));
+  public CategoriaDTO insert(CategoriaDTO categoriaDTO) {
+
+    Categoria entity = new Categoria();
+    copyDtoToEntity(categoriaDTO, entity);
+
+    entity = categoriaRepository.save(entity);
+
+    return new CategoriaDTO(entity);
   }
 
-  public CategoriaDTO listarPorId(Long id) {
-    return categoriaMapper.toDto(buscarOuFalhar(id));
+  public CategoriaDTO update(CategoriaDTO productDto, Long id) {
+
+    try {
+      Categoria entity = categoriaRepository.findById(id)
+          .orElseThrow(() -> new ResourceNotFoundException("Categoria nao encontrada"));
+      ;
+      copyDtoToEntity(productDto, entity);
+      entity = categoriaRepository.save(entity);
+      return new CategoriaDTO(entity);
+
+    } catch (
+
+    EntityNotFoundException e) {
+      throw new ResourceNotFoundException("Recurso nao encontrado");
+
+    }
+
   }
 
-  public List<CategoriaDTO> listarTodos() {
-    return categoriaRepository
-      .findAll()
-      .stream()
-      .map(categoriaMapper::toDto)
-      .collect(Collectors.toList());
+  // @Transactional(propagation = Propagation.SUPPORTS)
+  public void deleteById(Long id) {
+
+    try {
+      categoriaRepository.deleteById(id);
+
+    } catch (EmptyResultDataAccessException e) {
+      throw new ResourceNotFoundException("Cliente nao econtrado");
+    } catch (DataIntegrityViolationException e) {
+      throw new DatabaseExcption("Falha de integridade Referencial");
+    }
+
   }
 
-  public CategoriaDTO substituir(Long id, CategoriaDTO categoriaDto) {
-    Categoria categoriaNoBanco = buscarOuFalhar(id);
-    BeanUtils.copyProperties(categoriaDto, categoriaNoBanco, "id");
-    return categoriaMapper.toDto(categoriaRepository.save(categoriaNoBanco));
+  private void copyDtoToEntity(CategoriaDTO categoriaDTO, Categoria entity) {
+
+    entity.setDescricao(categoriaDTO.getDescricao());
+    entity.setNome(categoriaDTO.getNome());
+
   }
 
-  @Transactional
-  public void excluir(Long categoriaId) {
-    buscarOuFalhar(categoriaId);
-    categoriaRepository.deleteById(categoriaId);
-  }
 }
