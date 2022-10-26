@@ -1,75 +1,27 @@
-/* package com.ecommerce.api.controller;
+package com.ecommerce.api.controller;
 
-import java.util.Map;
-
-import javax.validation.Valid;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
-import org.springframework.data.web.PagedResourcesAssembler;
-import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.api.delivery.api.assembler.PedidoModelAssembler;
-import com.api.delivery.domain.model.Usuario;
-import com.ecommerce.api.assembler.PedidoInputDisassembler;
-import com.ecommerce.api.assembler.PedidoResumoModelAssembler;
-import com.ecommerce.api.model.PedidoModel;
-import com.ecommerce.api.model.PedidoResumoModel;
-import com.ecommerce.api.model.input.PedidoInput;
-import com.ecommerce.api.openapi.controller.PedidoControllerOpenApi;
-import com.ecommerce.core.data.PageWrapper;
-import com.ecommerce.core.data.PageableTranslator;
-import com.ecommerce.domain.exception.EntidadeNaoEncontradaException;
-import com.ecommerce.domain.exception.NegocioException;
-import com.ecommerce.domain.filter.PedidoFilter;
-import com.ecommerce.domain.model.Pedido;
-import com.ecommerce.domain.repository.PedidoRepository;
-import com.ecommerce.infra.repository.spec.PedidoSpecs;
+import com.ecommerce.domain.model.dtos.PedidoRequestDTO;
+import com.ecommerce.domain.model.dtos.PedidoResponseDTO;
+import com.ecommerce.domain.service.PedidoService;
 
-@RestController
-@RequestMapping(path = "/pedidos", produces = MediaType.APPLICATION_JSON_VALUE)
-public class PedidoController implements PedidoControllerOpenApi {
-
-  @Autowired
-  private PedidoRepository pedidoRepository;
-
-  @Autowired
-  private PedidoModelAssembler pedidoModelAssembler;
-
-  @Autowired
-  private PedidoResumoModelAssembler pedidoResumoModelAssembler;
-
-  @Autowired
-  private PedidoInputDisassembler pedidoInputDisassembler;
-
-  @Autowired
-  private PagedResourcesAssembler<Pedido> pagedResourcesAssembler;
-
-  @Override
-  @GetMapping
-  public PagedModel<PedidoResumoModel> pesquisar(
-    PedidoFilter filtro,
-    @PageableDefault(size = 10) Pageable pageable
-  ) {
-    Pageable pageableTraduzido = traduzirPageable(pageable);
-
-    Page<Pedido> pedidosPage = pedidoRepository.findAll(
-      PedidoSpecs.usandoFiltro(filtro),
-      pageableTraduzido
-    );
-
-    pedidosPage = new PageWrapper<>(pedidosPage, pageable);
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 
     return pagedResourcesAssembler.toModel(
       pedidosPage,
@@ -128,5 +80,3 @@ public class PedidoController implements PedidoControllerOpenApi {
 
     return PageableTranslator.translate(apiPageable, mapeamento);
   }
-}
- */

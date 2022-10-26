@@ -1,20 +1,10 @@
-/* package com.ecommerce.api.controller;
+package com.ecommerce.api.controller;
 
-import com.api.delivery.api.ResourceUriHelper;
-import com.ecommerce.api.assembler.CidadeInputDisassembler;
-import com.ecommerce.api.assembler.CidadeModelAssembler;
-import com.ecommerce.api.model.CidadeModel;
-import com.ecommerce.api.model.input.CidadeInput;
-import com.ecommerce.api.openapi.controller.CidadeControllerOpenApi;
-import com.ecommerce.domain.exception.EstadoNaoEncontradoException;
-import com.ecommerce.domain.exception.NegocioException;
-import com.ecommerce.domain.model.Cidade;
-import com.ecommerce.domain.repository.CidadeRepository;
-import com.ecommerce.domain.service.CidadeService;
 import java.util.List;
+
 import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -26,6 +16,21 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.ecommerce.api.assembler.CidadeInputDisassembler;
+import com.ecommerce.api.assembler.CidadeModelAssembler;
+import com.ecommerce.api.model.CidadeModel;
+import com.ecommerce.api.model.input.CidadeInput;
+import com.ecommerce.api.openapi.controller.CidadeControllerOpenApi;
+import com.ecommerce.domain.exception.EstadoNaoEncontradoException;
+import com.ecommerce.domain.exception.NegocioException;
+import com.ecommerce.domain.model.Cidade;
+import com.ecommerce.domain.repository.CidadeRepository;
+import com.ecommerce.domain.service.CidadeService;
+
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 
 @RestController
 @RequestMapping(path = "/cidades", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -43,24 +48,38 @@ public class CidadeController implements CidadeControllerOpenApi {
   @Autowired
   private CidadeInputDisassembler cidadeInputDisassembler;
 
-  @Override
   @GetMapping
-  public CollectionModel<CidadeModel> listar() {
+  @ApiOperation(value="Lista todos as cidades", notes="Listagem de Cidades")
+	@ApiResponses(value= {	 
+	@ApiResponse(code=200, message="Retorna todos as cidades"),	
+	@ApiResponse(code=505, message="Exceção interna da aplicação"),
+	})
+  public List<CidadeModel> listar() {
     List<Cidade> todasCidades = cidadeRepository.findAll();
 
     return cidadeModelAssembler.toCollectionModel(todasCidades);
   }
 
-  @Override
   @GetMapping("/{cidadeId}")
+  @ApiOperation(value="Listando uma cidade por id", notes="Listagem de uma cidade por id")
+	@ApiResponses(value= {	 
+	@ApiResponse(code=200, message="Retorna uma cidade pelo id"),
+	@ApiResponse(code=404, message="Recurso não encontrado"),
+	@ApiResponse(code=505, message="Exceção interna da aplicação"),
+	})
   public CidadeModel buscar(@PathVariable Long cidadeId) {
     Cidade cidade = cidadeService.buscarOuFalhar(cidadeId);
 
     return cidadeModelAssembler.toModel(cidade);
   }
 
-  @Override
   @PostMapping
+  @ApiOperation(value="Cadastra um cidades ", notes="Cadatro de Cidades")
+	@ApiResponses(value= {	 
+	@ApiResponse(code=201, message="Pedido cadastrado"),
+	@ApiResponse(code=500, message="Ocorreu um Erro na execução"),
+	@ApiResponse(code=505, message="Exceção interna da aplicação"),
+	})
   @ResponseStatus(HttpStatus.CREATED)
   public CidadeModel adicionar(@RequestBody @Valid CidadeInput cidadeInput) {
     try {
@@ -68,18 +87,20 @@ public class CidadeController implements CidadeControllerOpenApi {
 
       cidade = cidadeService.salvar(cidade);
 
-      CidadeModel cidadeModel = cidadeModelAssembler.toModel(cidade);
-
-      ResourceUriHelper.addUriInResponseHeader(cidadeModel.getId());
-
-      return cidadeModel;
+      return cidadeModelAssembler.toModel(cidade);
     } catch (EstadoNaoEncontradoException e) {
       throw new NegocioException(e.getMessage(), e);
     }
   }
 
-  @Override
   @PutMapping("/{cidadeId}")
+  @ApiOperation(value="Substitui uma cidade pelo id", notes="Substitui Cidades pelo id")
+	@ApiResponses(value= {	 
+	@ApiResponse(code=200, message="Modificações realizadas com sucesso"),
+	@ApiResponse(code=404, message="Recurso não encontrado"),
+	@ApiResponse(code=500, message="Ocorreu um Erro na execução"),
+	@ApiResponse(code=505, message="Exceção interna da aplicação"),
+	})
   public CidadeModel atualizar(
     @PathVariable Long cidadeId,
     @RequestBody @Valid CidadeInput cidadeInput
@@ -97,11 +118,16 @@ public class CidadeController implements CidadeControllerOpenApi {
     }
   }
 
-  @Override
   @DeleteMapping("/{cidadeId}")
+  @ApiOperation(value="Deleta uma cidade pelo id", notes="Deleta Cidade pelo id")
+	@ApiResponses(value= {	 
+	@ApiResponse(code=204, message="Pedido excluído"),
+	@ApiResponse(code=404, message="Recurso não encontrado"),
+	@ApiResponse(code=500, message="Ocorreu um Erro na execução"),
+	@ApiResponse(code=505, message="Exceção interna da aplicação"),
+	})
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void remover(@PathVariable Long cidadeId) {
     cidadeService.excluir(cidadeId);
   }
 }
- */
