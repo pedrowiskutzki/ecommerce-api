@@ -4,10 +4,11 @@ import com.ecommerce.domain.exception.DatabaseExcption;
 import com.ecommerce.domain.exception.ResourceNotFoundException;
 import com.ecommerce.domain.model.Categoria;
 import com.ecommerce.domain.model.Produto;
+import com.ecommerce.domain.model.dto.CategoriaDTO;
 import com.ecommerce.domain.model.dto.ProdutoDTO;
 import com.ecommerce.domain.repository.CategoriaRepository;
 import com.ecommerce.domain.repository.ProdutoRepository;
-import com.ecommerce.infra.img.ImgBBDTO;
+import com.ecommerce.domain.service.img.ImgBBDTO;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -128,7 +129,9 @@ public class ProdutoService {
       novoProduto.getCategoria().getId()
     );
 
-    return paraDTO(novoProduto, categoria);
+    CategoriaDTO categoriaDTO = new CategoriaDTO(categoria);
+    return paraDTO(novoProduto, categoriaDTO, categoria);
+    
   }
 
   private Produto convertProdutoFromStringJson(String produtoJson) {
@@ -144,7 +147,7 @@ public class ProdutoService {
     return produto;
   }
 
-  public ProdutoDTO paraDTO(Produto entity, Categoria categoria) {
+  public ProdutoDTO paraDTO(Produto entity,CategoriaDTO categoriaDTO, Categoria categoria) {
     entity.setNome(entity.getNome());
     entity.setDataCadastro(entity.getDataCadastro());
 
@@ -154,30 +157,18 @@ public class ProdutoService {
     entity.setCategoria(entity.getCategoria());
     entity.setImagemUrl(entity.getImagemUrl());
     entity.setDescricao(entity.getDescricao());
+    categoria.setId(categoriaDTO.getId());
+    categoria.setDescricao(categoriaDTO.getDescricao());
+    categoria.setNome(categoriaDTO.getNome());
 
     entity.setCategoria(categoria);
+    
 
     entity = produtoRepository.save(entity);
 
     return new ProdutoDTO(entity);
   }
 
-  /*
-   * @Transactional
-   * public ProdutoDTO insert(ProdutoDTO productDto) {
-   *
-   * Produto entity = new Produto();
-   *
-   * Categoria categoria =
-   * categoriaRepository.getReferenceById(productDto.getCategoria().getId());
-   *
-   * entity.setCategoria(categoria);
-   *
-   * copyDtoToEntity(productDto, entity);
-   * entity = produtoRepository.save(entity);
-   * return new ProdutoDTO(entity);
-   * }
-   */
   public ProdutoDTO update(ProdutoDTO productDto, Long id) {
     try {
       Produto entity = produtoRepository.getReferenceById(id);

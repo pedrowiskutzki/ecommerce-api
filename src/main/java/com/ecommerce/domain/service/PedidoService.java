@@ -112,12 +112,12 @@ public class PedidoService {
     pedidoRepository.save(pedido);
     itemPedidoRepository.saveAll(pedido.getItems());
 
-    RelatorioDTO relatorio = new RelatorioDTO(pedido);
-    mailConfig.sendEmail(
-      cliente.getEmail(),
-      "Dados do Pedido",
-      relatorio.toString()
-    );
+    // RelatorioDTO relatorio = new RelatorioDTO(pedido);
+    // mailConfig.sendEmail(
+    //   cliente.getEmail(),
+    //   "Dados do Pedido",
+    //   relatorio.toString()
+    // );
 
     return new PedidoDTO(pedido);
   }

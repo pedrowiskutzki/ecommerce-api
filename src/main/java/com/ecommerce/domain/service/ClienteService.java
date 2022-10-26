@@ -136,12 +136,6 @@ public class ClienteService {
 
     novoCliente = clienteRepository.save(novoCliente);
 
-    // Enviando Email para notificar a mudança no cadastro
-    mailConfig.sendEmail(
-      clienteInserirDTO.getEmail(),
-      "Atualização de cadastro de Usuário",
-      novoCliente.toString()
-    );
 
     return new ClienteDTO(novoCliente);
   }

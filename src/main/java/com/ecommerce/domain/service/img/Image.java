@@ -1,4 +1,4 @@
-package com.ecommerce.infra.img;
+package com.ecommerce.domain.service.img;
 
 public class Image {
 
